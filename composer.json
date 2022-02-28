@@ -1,0 +1,26 @@
+{
+  "name": "infira/wolo",
+  "description": "Collection of php utils and shortcuts",
+  "type": "library",
+  "authors": [
+	{
+	  "name": "gen.taliaru",
+	  "email": "gen@infira.ee"
+	}
+  ],
+  "autoload": {
+	"psr-4": {
+	  "Wolo\\File\\": "src/Components/File"
+	}
+  },
+  "minimum-stability": "stable",
+  "require": {
+	"php": ">=8.0.2"
+  },
+  "suggest": {
+	"symfony/filesystem": "Needed for File::move, File::rename file oprations"
+  },
+  "require-dev": {
+	"symfony/var-dumper": "^6.0"
+  }
+}
