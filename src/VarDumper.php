@@ -42,7 +42,7 @@ class VarDumper
 				echo self::json($var);
 			}
 			else {
-				echo self::browser($var);
+				echo self::pre($var);
 			}
 		}
 	}
