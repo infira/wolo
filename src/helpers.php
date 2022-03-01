@@ -3,31 +3,19 @@
 
 use Wolo\VarDumper;
 
-if (!function_exists('debug'))
-{
+if (!function_exists('debug')) {
 	function debug(...$moreVars)
 	{
-		if (count($moreVars) > 1)
-		{
-			$html = VarDumper::dump($moreVars);
-		}
-		else
-		{
-			$html = VarDumper::dump($moreVars[0]);
-		}
-		echo "<pre>$html</pre>";
+		VarDumper::debug(...$moreVars);
 	}
 }
 
 
-if (!function_exists('checkArray'))
-{
+if (!function_exists('checkArray')) {
 	function checkArray($array): bool
 	{
-		if (is_array($array))
-		{
-			if (count($array) > 0)
-			{
+		if (is_array($array)) {
+			if (count($array) > 0) {
 				return true;
 			}
 		}

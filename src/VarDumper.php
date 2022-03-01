@@ -34,15 +34,23 @@ class VarDumper
 	
 	public static function debug(...$vars)
 	{
-		foreach ($vars as $var) {
-			if (self::isConsole()) {
-				echo self::console($vars);
-			}
-			elseif (self::isJSON()) {
-				echo self::json($var);
-			}
-			else {
-				echo self::pre($var);
+		if (is_string($vars[1]) and $vars[1] == '=>' and count($vars) == 3) {
+			self::debug([$vars[0] => $vars[2]]);
+		}
+		elseif (is_string($vars[0]) and substr($vars[0], -3) == ':=>' and count($vars) == 2) {
+			self::debug([substr($vars[0], 0, -3) => $vars[1]]);
+		}
+		else {
+			foreach ($vars as $var) {
+				if (self::isConsole()) {
+					echo self::console($vars);
+				}
+				elseif (self::isJSON()) {
+					echo self::json($var);
+				}
+				else {
+					echo self::pre($var);
+				}
 			}
 		}
 	}
