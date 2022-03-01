@@ -2,7 +2,7 @@
 
 namespace Wolo\File;
 
-class Dir
+class Path
 {
 	/**
 	 * Add / to end of path if needed
