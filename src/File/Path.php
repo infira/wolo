@@ -24,14 +24,43 @@ class Path
 	}
 	
 	/**
-	 * Makes a correct file path concat('directory/path','myFile.txt') => directory/path/myFile.txt
+	 * Join path parts together into a canonical path.
 	 *
-	 * @param string $directoryPath
-	 * @param string $filename
+	 * @author https://github.com/symfony/symfony/blob/6.0/src/Symfony/Component/Filesystem/Path.php
+	 * @param string ...$paths
 	 * @return string
 	 */
-	public static function concat(string $directoryPath, string $filename)
+	public static function join(string ...$paths): string
 	{
-		return self::slash($directoryPath) . $filename;
+		$finalPath = null;
+		$wasScheme = false;
+		
+		foreach ($paths as $path) {
+			if ('' === $path) {
+				continue;
+			}
+			
+			if (null === $finalPath) {
+				// For first part we keep slashes, like '/top', 'C:\' or 'phar://'
+				$finalPath = $path;
+				$wasScheme = (false !== mb_strpos($path, '://'));
+				continue;
+			}
+			
+			// Only add slash if previous part didn't end with '/' or '\'
+			if (!\in_array(mb_substr($finalPath, -1), ['/', '\\'])) {
+				$finalPath .= '/';
+			}
+			
+			// If first part included a scheme like 'phar://' we allow \current part to start with '/', otherwise trim
+			$finalPath .= $wasScheme ? $path : ltrim($path, '/');
+			$wasScheme = false;
+		}
+		
+		if (null === $finalPath) {
+			return '';
+		}
+		
+		return $finalPath;
 	}
 }
