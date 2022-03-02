@@ -281,11 +281,19 @@ class Folder
 	
 	private static function doFlush(string $path, bool $selfRemove)
 	{
-		array_map('unlink', self::filesRecursive($path));
-		array_map('rmdir', self::foldersRecursive($path));
+		$realpath = realpath($path);
+		if ($realpath === false) {
+			return;
+		}
+		if (is_file($realpath)) {
+			throw new \Exception("path ('$realpath') is a file");
+		}
+		
+		array_map('unlink', self::filesRecursive($realpath));
+		array_map('rmdir', self::foldersRecursive($realpath));
 		
 		if ($selfRemove) {
-			rmdir($path);
+			rmdir($realpath);
 		}
 	}
 }
