@@ -230,7 +230,7 @@ class Folder
 			if ($file == '.' or $file == '..') {
 				continue;
 			}
-			$file = realpath(Path::concat($realpath, $file));
+			$file = realpath(Path::join($realpath, $file));
 			
 			if (is_dir($file) and $recursive === true) {
 				$output = array_merge($output, self::scanner($file, $recursive, $includeFolders, $includeFiles, $getAbsolutePaths, $excludePatterns, $filterPatterns));
