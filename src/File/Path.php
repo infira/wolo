@@ -5,7 +5,7 @@ namespace Wolo\File;
 class Path
 {
 	/**
-	 * Add / to end of path if needed
+	 * Add trailing slash if not exists
 	 *
 	 * @param string $path
 	 * @return string
