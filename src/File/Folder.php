@@ -219,15 +219,18 @@ class Folder
 	public static function scanner(string $path, bool $recursive, bool $includeFolders, bool $includeFiles, bool $getAbsolutePaths, array $excludePatterns = [], array $filterPatterns = []): array
 	{
 		$output = [];
-		$path   = realpath($path);
-		if (!is_dir($path)) {
-			throw new \Exception("$path folder does not exists");
+		$realpath   = realpath($path);
+		if ($realpath === false) {
+			throw new \Exception("cant resolve realpath of ('$path')");
 		}
-		foreach (scandir($path) as $file) {
+		if (!is_dir($realpath)) {
+			throw new \Exception("$realpath folder does not exists");
+		}
+		foreach (scandir($realpath) as $file) {
 			if ($file == '.' or $file == '..') {
 				continue;
 			}
-			$file = realpath(Path::concat($path, $file));
+			$file = realpath(Path::concat($realpath, $file));
 			
 			if (is_dir($file) and $recursive === true) {
 				$output = array_merge($output, self::scanner($file, $recursive, $includeFolders, $includeFiles, $getAbsolutePaths, $excludePatterns, $filterPatterns));
