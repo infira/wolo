@@ -44,6 +44,7 @@ class Regex
 	 * Check whatever $pattern is valid regular expression pattern
 	 *
 	 * @param string $pattern
+	 * @param array  $checkWithDelimiters
 	 * @return bool
 	 */
 	public static function isPattern(string $pattern, array $checkWithDelimiters = ['/', '#', '~']): bool
