@@ -2,9 +2,6 @@
 
 namespace Wolo\Globals;
 
-require_once '../../vendor/autoload.php';
-
-
 use Closure;
 use Wolo\Globals\GlobalsCollection;
 
