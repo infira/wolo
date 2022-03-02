@@ -2,8 +2,6 @@
 
 namespace Wolo\Date;
 
-require_once '../../vendor/autoload.php';
-
 use stdClass;
 use DateTime;
 use DateTimeZone;
