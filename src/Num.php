@@ -2,8 +2,6 @@
 
 namespace Wolo;
 
-require_once '../vendor/autoload.php';
-
 use Wolo\Traits\NumberTrait;
 
 class Num

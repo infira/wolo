@@ -2,20 +2,22 @@
 
 namespace Wolo;
 
-use Wolo\Traits\StrTrait;
+use Wolo\Traits\StringTrait;
 
 class Str
 {
 	/**
-	 * Trait is used cause then u can use StrTrait in other Str.php files
+	 * Trait is used cause then u can use StringTrait in other Str.php files
 	 * For example in Laravel make your own Str class
 	 * namespace App\Support;
 	 * class Str extends \Illuminate\Support\Str
 	 * {
-	 *      use \Wolo\Traits\StrTrait;
+	 *      use \Wolo\Traits\StringTrait;
 	 *
 	 *      ... your own methods
 	 * }
+	 *
+	 * also, traits are easily overridable
 	 */
-	use StrTrait;
+	use StringTrait;
 }
