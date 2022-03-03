@@ -6,6 +6,7 @@ namespace Wolo\Globals;
 use Closure;
 use Wolo\Str;
 use JetBrains\PhpStorm\ArrayShape;
+use Exception;
 
 final class GlobalsCollection
 {
@@ -223,12 +224,28 @@ final class GlobalsCollection
 	 * Execute $callback once
 	 * if $keys is not provided then cache ID will be generated using callable footprint
 	 *
-	 * @param callable $callback method result will be set to memory for later use
 	 * @param mixed    ...$keys
+	 * @param callable $callback method result will be set to memory for later use
 	 * @return mixed - $callback result
 	 */
-	public function once(callable $callback, ...$keys): mixed
+	public function once(...$parameters): mixed
 	{
+		$keys     = [];
+		$callback = null;
+		foreach ($parameters as $parameter) {
+			if (is_callable($parameter)) {
+				$callback = $parameter;
+			}
+			else {
+				$keys[] = $parameter;
+			}
+		}
+		if (!$callback) {
+			throw new Exception('one of the parameters must be callback');
+		}
+		if (!$keys) {
+			$keys = $callback;
+		}
 		$cid = hash("crc32b", Str::hashable($keys));
 		if (!$this->exists($cid)) {
 			$this->set($cid, $callback());

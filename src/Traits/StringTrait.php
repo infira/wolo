@@ -160,19 +160,19 @@ trait StringTrait
 	
 	/**
 	 * Generate any varyable to hashable string
-	 * Use cases use this to md5(Str::cacheable(value), or hash('algo',Str::cacheable(value))
+	 * Use cases use this to md5(Str::hashable(value), or hash('algo',Str::hashable(value))
 	 *
-	 * @param mixed ...$cacheable
+	 * @param mixed ...$hashable
 	 * @return string
 	 */
-	public static function hashable(...$cacheable): string
+	public static function hashable(...$hashable): string
 	{
 		$output = [];
-		foreach ($cacheable as $value) {
+		foreach ($hashable as $value) {
 			if ($value instanceof \Closure) {
 				$value = (new \ReflectionFunction($value))->__toString();
 				$value = preg_replace('/\@\@.+/', '', $value);//remove file location
-				$value = self::cacheable($value);
+				$value = self::hashable($value);
 			}
 			elseif (is_object($value)) {
 				$value = serialize($value);
@@ -181,7 +181,7 @@ trait StringTrait
 				$arr   = $value;
 				$value = [];
 				foreach ($arr as $key => $v) {
-					$value[] = self::cacheable($key) . '-' . self::cacheable($v);
+					$value[] = self::hashable($key) . '-' . self::hashable($v);
 				}
 				$value = join('-', $value);
 			}
