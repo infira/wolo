@@ -43,7 +43,7 @@ class VarDumper
 		else {
 			foreach ($vars as $var) {
 				if (self::isConsole()) {
-					echo self::console($vars);
+					echo self::console($var);
 				}
 				elseif (self::isJSON()) {
 					echo self::json($var);
