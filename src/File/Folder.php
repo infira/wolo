@@ -218,8 +218,8 @@ class Folder
 	 */
 	public static function scanner(string $path, bool $recursive, bool $includeFolders, bool $includeFiles, bool $getAbsolutePaths, array $excludePatterns = [], array $filterPatterns = []): array
 	{
-		$output = [];
-		$realpath   = realpath($path);
+		$output   = [];
+		$realpath = realpath($path);
 		if ($realpath === false) {
 			throw new \Exception("cant resolve realpath of ('$path')");
 		}
@@ -267,8 +267,6 @@ class Folder
 		foreach ($patterns as $pattern) {
 			
 			if ((Str::endsWith($pattern, '$') or Str::startsWith($pattern, '^')) and preg_match('/' . $pattern . '\z/u', $str) === 1) {
-				debug("asdasd");
-				
 				return true;
 			}
 			if (Str::is($pattern, $str)) {
