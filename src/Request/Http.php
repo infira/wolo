@@ -5,7 +5,7 @@ namespace Wolo\Request;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 
-require_once '../../vendor/autoload.php';
+//require_once '../../vendor/autoload.php';
 
 /**
  * @method static array all() - all values from $_REQUEST

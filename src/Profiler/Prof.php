@@ -2,7 +2,7 @@
 
 namespace Wolo\Profiler;
 
-require_once '../../vendor/autoload.php';
+//require_once '../../vendor/autoload.php';
 
 use Exception;
 
