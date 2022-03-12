@@ -42,8 +42,8 @@ class Date
 	public static function of(string|int $datetime = 'now', ?DateTimeZone $timezone = null): DateDriver
 	{
 		$ts = null;
-		if (is_int($datetime)) {
-			$ts       = $datetime;
+		if (is_int($datetime) or is_numeric($datetime)) {
+			$ts       = (int)$datetime;
 			$datetime = 'now';
 		}
 		$driver = new DateDriver($datetime, $timezone);
