@@ -27,9 +27,13 @@ class VarDumper
 		return str_contains(PHP_SAPI, 'cli');
 	}
 	
-	private static function isJSON(): bool
+	private static function isJSON($var): bool
 	{
-		return str_contains(self::getHeader('accept'), 'json');
+		if ((is_object($var) and $var instanceof \stdClass) or is_array($var)) {
+			return str_contains(self::getHeader('accept'), 'json');
+		}
+		
+		return false;
 	}
 	
 	public static function debug(...$vars)
@@ -45,7 +49,7 @@ class VarDumper
 				if (self::isConsole()) {
 					echo self::console($var);
 				}
-				elseif (self::isJSON()) {
+				elseif (self::isJSON($var)) {
 					echo self::json($var);
 				}
 				else {
@@ -82,10 +86,7 @@ class VarDumper
 			return print_r($var, true);
 		}
 		else {
-			ob_start();
-			var_dump($var);
-			
-			return ob_get_clean();
+			return var_export($var, true);
 		}
 	}
 }
