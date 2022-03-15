@@ -10,7 +10,7 @@ if (!function_exists('debug')) {
 	}
 }
 
-if (!function_exists('debug')) {
+if (!function_exists('getTrace')) {
 	function getTrace(int $startAt = 0): string
 	{
 		$backTrace = debug_backtrace();
