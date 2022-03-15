@@ -11,7 +11,7 @@ if (!function_exists('debug')) {
 }
 
 if (!function_exists('getTrace')) {
-	function getTrace(int $startAt = 0): string
+	function getTrace(int $startAt = 0): array
 	{
 		$backTrace = debug_backtrace();
 		$until     = 15;
@@ -19,12 +19,12 @@ if (!function_exists('getTrace')) {
 		$nr        = 1;
 		for ($i = $startAt; $i <= $until; $i++) {
 			if (isset($backTrace[$i]['file'])) {
-				$trace[$nr] = $backTrace[$i]['file'] . ' : ' . $backTrace[$i]['line'];
+				$trace[$nr] = str_replace(getcwd(), "", $backTrace[$i]['file']) . ' : ' . $backTrace[$i]['line'];
 				$nr++;
 			}
 		}
 		
-		return str_replace(getcwd(), "", $trace);
+		return $trace;
 	}
 }
 
