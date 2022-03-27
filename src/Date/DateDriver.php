@@ -33,6 +33,14 @@ class DateDriver
 	}
 	
 	/**
+	 * @return DateTime|\Carbon\Carbon
+	 */
+	public function getDriver()
+	{
+		return $this->driver;
+	}
+	
+	/**
 	 * Format to d m Y separated by $separator
 	 *
 	 * @param string $separator = '.'
