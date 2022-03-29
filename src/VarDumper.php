@@ -69,7 +69,10 @@ class VarDumper
 			return print_r($var, true);
 		}
 		else {
-			return var_export($var, true);
+			ob_start();
+			var_dump($var);
+			
+			return ob_get_clean();
 		}
 	}
 }
