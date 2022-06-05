@@ -2,6 +2,8 @@
 
 namespace Wolo\Traits;
 
+use Wolo\Regex;
+
 trait StringTrait
 {
 	/**
