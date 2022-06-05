@@ -9,7 +9,7 @@ use JetBrains\PhpStorm\NoReturn;
 
 /**
  * @method static array all() - all values from $_REQUEST
- * @method static mixed get(string $key, mixed $default = null) - get from $_REQUEST
+ * @method static mixed get(string $key = null, mixed $default = null) - get from $_REQUEST
  * @method static mixed set(string $key, $value) - set to $_REQUEST
  * @method static mixed delete(string $key) - delete from $_REQUEST
  * @method static mixed unset(string $key) - delete from $_REQUEST
@@ -18,7 +18,7 @@ use JetBrains\PhpStorm\NoReturn;
  * @method static mixed flush() - flush $_REQUEST
  *
  * @method static array allGET() - all values from $_GET
- * @method static mixed getGET(string $key, mixed $default = null) - get from $_GET
+ * @method static mixed getGET(string $key = null, mixed $default = null) - get from $_GET
  * @method static mixed setGET(string $key, $value) - set to $_GET
  * @method static mixed deleteGET(string $key) - delete from $_GET
  * @method static mixed unsetGET(string $key) - delete from $_GET
@@ -27,7 +27,7 @@ use JetBrains\PhpStorm\NoReturn;
  * @method static mixed flushGET() - flush $_GET
  *
  * @method static array allPOST() - all values from $_POST
- * @method static mixed getPOST(string $key, mixed $default = null) - get from $_POST
+ * @method static mixed getPOST(string $key = null, mixed $default = null) - get from $_POST
  * @method static mixed setPOST(string $key, $value) - set to $_POST
  * @method static mixed deletePOST(string $key) - delete from $_POST
  * @method static mixed unsetPOST(string $key) - delete from $_POST
@@ -36,7 +36,7 @@ use JetBrains\PhpStorm\NoReturn;
  * @method static mixed flushPOST() - flush $_POST
  *
  * @method static array allFILE() - all values from $_FILES
- * @method static mixed getFILE(string $key, mixed $default = null) - get from $_FILES
+ * @method static mixed getFILE(string $key = null, mixed $default = null) - get from $_FILES
  * @method static mixed setFILE(string $key, $value) - set to $_FILES
  * @method static mixed deleteFILE(string $key) - delete from $_FILES
  * @method static mixed unsetFILE(string $key) - delete from $_FILES
@@ -45,7 +45,7 @@ use JetBrains\PhpStorm\NoReturn;
  * @method static mixed flushFILE() - flush $_FILES
  *
  * @method static array allSERVER() - all values from $_SERVER
- * @method static mixed getSERVER(string $key, mixed $default = null) - get from $_SERVER
+ * @method static mixed getSERVER(string $key = null, mixed $default = null) - get from $_SERVER
  * @method static mixed setSERVER(string $key, $value) - set to $_SERVER
  * @method static bool existsSERVER(string $key) - does $key exists in $_SERVER
  * @method static bool hasSERVER(string $key) - does $key exists in $_SERVER

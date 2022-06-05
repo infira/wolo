@@ -17,8 +17,11 @@ class RequestVariableCollection
 		return $this->data;
 	}
 	
-	public function get(string $name, mixed $default = null): mixed
+	public function get(string $name = null, mixed $default = null): mixed
 	{
+		if ($name === null) {
+			return $this->data;
+		}
 		if (self::exists($name)) {
 			return $this->data[$name];
 		}
