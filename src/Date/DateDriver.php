@@ -4,6 +4,7 @@ namespace Wolo\Date;
 
 use \DateTime;
 use \DateTimeZone;
+use stdClass;
 
 /**
  * @mixin DateTime
@@ -89,7 +90,6 @@ class DateDriver
 		return $this->format(Date::$niceTimeFormat);
 	}
 	
-	
 	/**
 	 * format to Y-m-d
 	 *
@@ -143,5 +143,39 @@ class DateDriver
 	public function time(): int
 	{
 		return $this->getTimestamp();
+	}
+	
+	/**
+	 * Get days,years,hours,minutes,seconds from time
+	 *
+	 * @return stdClass
+	 */
+	public function parts(): stdClass
+	{
+		$time           = $this->time();
+		$value          = new stdClass();
+		$value->years   = 0;
+		$value->days    = 0;
+		$value->hours   = 0;
+		$value->minutes = 0;
+		if ($time >= 31556926) {
+			$value->years = floor($time / 31556926);
+			$time         = ($time % 31556926);
+		}
+		if ($time >= 86400) {
+			$value->days = floor($time / 86400);
+			$time        = ($time % 86400);
+		}
+		if ($time >= 3600) {
+			$value->hours = floor($time / 3600);
+			$time         = ($time % 3600);
+		}
+		if ($time >= 60) {
+			$value->minutes = floor($time / 60);
+			$time           = ($time % 60);
+		}
+		$value->seconds = floor($time);
+		
+		return $value;
 	}
 }
