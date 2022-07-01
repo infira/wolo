@@ -37,9 +37,16 @@ class Folder
 	 */
 	public static function make(string $path, int $chmod = 0777): string
 	{
-		if (!file_exists($path)) {
-			mkdir($path, $chmod, true);
+		if (!$path) {
+			throw new \Exception('path cannot be empty');
 		}
+		if (is_file($path)) {
+			throw new \Exception('path cannot be file');
+		}
+		if (is_dir($path)) {
+			return $path;
+		}
+		mkdir($path, $chmod, true);
 		
 		return $path;
 	}
