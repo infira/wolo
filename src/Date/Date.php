@@ -8,7 +8,7 @@ use DateTimeZone;
 use Wolo\File\FileOperations;
 
 /**
- * Use composer require carbondate/carbon to use more advanced features
+ * Use composer require nesbot/carbon to use more advanced features
  * Date::$driver = \Carbon\Carbon::class
  * @method static string f(string|int $value, string $format) alias to format()
  * @method static string dmy(string|int $value) Format to d m Y separated by $separator
