@@ -74,12 +74,12 @@ class Http
             return self::url()->$name(...$arguments);
         }
         if (in_array($name, ['getFILE', 'setFILE', 'deleteFILE', 'unsetFILE', 'existsFILE', 'hasFILE', 'flushFILE'])) {
-            $name = substr($name, -4);
+            $name = substr($name, 0, -4);
 
             return self::file()->$name(...$arguments);
         }
         if (in_array($name, ['getSERVER', 'existsSERVER', 'hasSERVER'])) {
-            $name = substr($name, -4);
+            $name = substr($name, 0, -6);
 
             return self::server()->$name(...$arguments);
         }
