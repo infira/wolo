@@ -32,9 +32,3 @@ class Prof
         return self::of()->$name(...$arguments);
     }
 }
-
-Prof::measure('test', static function () {
-    sleep(3);
-});
-
-Prof::print();
