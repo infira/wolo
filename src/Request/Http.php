@@ -64,7 +64,7 @@ class Http
             return self::request()->$name(...$arguments);
         }
         if (in_array($name, ['getPOST', 'setPOST', 'deletePOST', 'unsetPOST', 'existsPOST', 'hasPOST', 'flushPOST'])) {
-            $name = substr($name, -4);
+            $name = substr($name, 0, -4);
 
             return self::post()->$name(...$arguments);
         }
