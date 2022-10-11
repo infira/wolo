@@ -4,8 +4,8 @@
 use Wolo\VarDumper;
 
 if (!function_exists('debug')) {
-	function debug(...$moreVars)
-	{
+	function debug(...$moreVars): void
+    {
 		VarDumper::debug(...$moreVars);
 	}
 }

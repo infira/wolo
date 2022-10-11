@@ -3,7 +3,6 @@
 namespace Wolo\Globals;
 
 use Closure;
-use Wolo\Globals\GlobalsCollection;
 
 /**
  * TempController
@@ -28,23 +27,23 @@ use Wolo\Globals\GlobalsCollection;
  */
 class Globals
 {
-	private static array $collections = [];
-	
-	/**
-	 * @param string $key - collection name
-	 * @return GlobalsCollection
-	 */
-	public static function of(string $key): GlobalsCollection
-	{
-		if (!isset(self::$collections[$key])) {
-			self::$collections[$key] = new GlobalsCollection($key);
-		}
-		
-		return self::$collections[$key];
-	}
-	
-	public static function __callStatic(string $method, array $args)
-	{
-		return self::of('general')->$method(...$args);
-	}
+    private static array $collections = [];
+
+    /**
+     * @param string $key - collection name
+     * @return GlobalsCollection
+     */
+    public static function of(string $key): GlobalsCollection
+    {
+        if (!isset(self::$collections[$key])) {
+            self::$collections[$key] = new GlobalsCollection($key);
+        }
+
+        return self::$collections[$key];
+    }
+
+    public static function __callStatic(string $method, array $args)
+    {
+        return self::of('general')->$method(...$args);
+    }
 }

@@ -13,7 +13,7 @@ trait NumberTrait
 	 */
 	public static function referenceNumber(int $of): int
 	{
-		$svn     = "$of";
+		$svn     = (string)$of;
 		$weights = [7, 3, 1];
 		$count   = 0;
 		$sum     = 0;

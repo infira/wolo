@@ -3,8 +3,7 @@
 namespace Wolo\Profiler;
 
 //require_once '../../vendor/autoload.php';
-
-use Exception;
+use Wolo\Globals\Globals;
 
 /**
  * @method static void void(string $name)
@@ -17,27 +16,25 @@ use Exception;
  */
 class Prof
 {
-	/**
-	 * @param string $name
-	 * @return Profiler
-	 */
-	public static function of(string $name = "globalProfiler"): Profiler
-	{
-		return \Wolo\Globals\Globals::once(function ()
-		{
-			return new Profiler();
-		}, $name);
-	}
-	
-	public static function __callStatic(string $name, array $arguments)
-	{
-		return self::of()->$name(...$arguments);
-	}
+    /**
+     * @param string $name
+     * @return Profiler
+     */
+    public static function of(string $name = "globalProfiler"): Profiler
+    {
+        return Globals::once(static function () {
+            return new Profiler();
+        }, $name);
+    }
+
+    public static function __callStatic(string $name, array $arguments)
+    {
+        return self::of()->$name(...$arguments);
+    }
 }
 
-Prof::measure('test', function ()
-{
-	sleep(3);
+Prof::measure('test', static function () {
+    sleep(3);
 });
 
 Prof::print();

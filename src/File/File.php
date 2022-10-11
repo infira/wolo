@@ -2,6 +2,7 @@
 
 namespace Wolo\File;
 
+use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
@@ -23,37 +24,39 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class File
 {
-	private static Filesystem $fs;
-	
-	public static function __callStatic(string $name, array $arguments)
-	{
-		return FileOperations::of($arguments[0])->$name(...array_slice($arguments, 1));
-	}
-	
-	/**
-	 * Alias to create new Symfony Filesystem
-	 *
-	 * @return \Symfony\Component\Filesystem\Filesystem
-	 */
-	public static function fs(): Filesystem
-	{
-		if (!isset(self::$fs)) {
-			self::$fs = new Filesystem();
-		}
-		
-		return self::$fs;
-	}
-	
-	/**
-	 * Delete file(s)
-	 *
-	 * @param iterable|string ...$files
-	 * @return void
-	 */
-	public static function delete(iterable|string ...$files)
-	{
-		foreach ($files as $file) {
-			self::fs()->remove($file);
-		}
-	}
+    private static Filesystem $fs;
+
+    public static function __callStatic(string $name, array $arguments)
+    {
+        return FileOperations::of($arguments[0])->$name(...array_slice($arguments, 1));
+    }
+
+    /**
+     * Alias to create new Symfony Filesystem
+     *
+     * @return Filesystem
+     */
+    public static function fs(): Filesystem
+    {
+        if (!isset(self::$fs)) {
+            self::$fs = new Filesystem();
+        }
+
+        return self::$fs;
+    }
+
+    /**
+     * Delete file(s)
+     *
+     * @param iterable|string ...$files
+     * @throws IOException
+     */
+    public static function delete(iterable|string ...$files): bool
+    {
+        foreach ($files as $file) {
+            self::fs()->remove($file);
+        }
+
+        return true;
+    }
 }
