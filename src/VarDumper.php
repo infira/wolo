@@ -29,10 +29,10 @@ class VarDumper
 
     public static function debug(...$vars): void
     {
-        if (count($vars) === 3 && $vars[1] === '=>') {
+        if (count($vars) === 3 && is_string($vars[0]) && $vars[1] === '=>') {
             self::debug([$vars[0] => $vars[2]]);
         }
-        elseif (count($vars) === 2 && str_ends_with($vars[0], ':=>')) {
+        elseif (count($vars) === 2 && is_string($vars[0]) && str_ends_with($vars[0], ':=>')) {
             self::debug([substr($vars[0], 0, -3) => $vars[1]]);
         }
         else {
