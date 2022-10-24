@@ -220,31 +220,21 @@ final class GlobalsCollection
 
     /**
      * Execute $callback once
-     * if $keys is not provided then cache ID will be generated using callable footprint
      *
-     * @param mixed ...$keys
+     * @param mixed ...$parameters - will be used to generate hashsum ID for storing $callback result
      * @param callable $callback method result will be set to memory for later use
      * @return mixed - $callback result
      */
     public function once(...$parameters): mixed
     {
-        $keys = [];
-        $callback = null;
-        foreach ($parameters as $parameter) {
-            if (is_callable($parameter)) {
-                $callback = $parameter;
-            }
-            else {
-                $keys[] = $parameter;
-            }
+        if (!$parameters) {
+            throw new RuntimeException('parameters not defined');
         }
-        if (!$callback) {
-            throw new RuntimeException('one of the parameters must be callback');
+        $callback = $parameters[array_key_last($parameters)];
+        if (!is_callable($callback)) {
+            throw new RuntimeException('last parameter must be callable');
         }
-        if (!$keys) {
-            $keys = $callback;
-        }
-        $cid = hash("crc32b", Str::hashable($keys));
+        $cid = hash("crc32b", Str::hashable($parameters));
         if (!$this->exists($cid)) {
             $this->set($cid, $callback());
         }

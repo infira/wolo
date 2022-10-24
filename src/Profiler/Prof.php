@@ -22,9 +22,9 @@ class Prof
      */
     public static function of(string $name = "globalProfiler"): Profiler
     {
-        return Globals::once(static function () {
+        return Globals::once('woloProfiler', $name, static function () {
             return new Profiler();
-        }, $name);
+        }); 
     }
 
     public static function __callStatic(string $name, array $arguments)
