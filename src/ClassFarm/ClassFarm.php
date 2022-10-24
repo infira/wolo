@@ -69,13 +69,13 @@ class ClassFarm
         }
         if (!static::constructed($name)) {
             $constructor = static::$farm[$name]->constructor;
+            static::$farm[$name]->constructed = true;
             if (is_string($constructor)) {
                 static::$farm[$name]->classObject = new $constructor();
             }
             else {
                 static::$farm[$name]->classObject = $constructor();
             }
-            static::$farm[$name]->constructed = true;
         }
 
         return static::$farm[$name]->classObject;
