@@ -4,6 +4,7 @@ namespace Wolo\Globals;
 
 
 use JetBrains\PhpStorm\ArrayShape;
+use ReflectionException;
 use RuntimeException;
 use Wolo\Str;
 
@@ -219,11 +220,13 @@ final class GlobalsCollection
     }
 
     /**
-     * Execute $callback once
+     * Execute $callback once by hash-sum of $parameters
      *
-     * @param mixed ...$parameters - will be used to generate hashsum ID for storing $callback result
+     * @param mixed ...$parameters - will be used to generate hash sum ID for storing $callback result
      * @param callable $callback method result will be set to memory for later use
      * @return mixed - $callback result
+     * @throws ReflectionException
+     * @noinspection PhpDocSignatureInspection
      */
     public function once(...$parameters): mixed
     {
