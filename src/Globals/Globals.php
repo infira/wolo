@@ -21,7 +21,7 @@ use Closure;
  * @method static void eachCollection(callable $callback) Call $callback for every collection<br />$callback($Collection, $collectionName)
  * @method static array collections() get this all collections
  * @method static mixed magic(Closure $callback) Execute closure once per $key existence
- * @method static mixed once(mixed ...$parameters, callable $callback) Execute $callback once by hash-sum of $parameters
+ * @method static mixed once(mixed ...$keys, callable $callback) Execute $callback once by hash-sum of $parameters
  * @method static mixed onceForce(string|array $key, bool $forceExec, callable $callback) Execute $callback once per $key existence or force it to call
  * @method static bool flush() - Flush current data and collections
  */
