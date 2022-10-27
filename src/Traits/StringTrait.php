@@ -6,6 +6,9 @@ use Closure;
 use Exception;
 use ReflectionException;
 use ReflectionFunction;
+use Serializable;
+use stdClass;
+use Stringable;
 use Wolo\Regex;
 
 trait StringTrait
@@ -161,12 +164,40 @@ trait StringTrait
     }
 
     /**
-     * Generate any varyable to hashable string
+     * Dump variable into printable string
+     *
+     * @param mixed $var
+     * @return string
+     */
+    public static function dump(mixed $var): string
+    {
+        ob_start();
+        var_dump($var);
+
+        return ob_get_clean();
+    }
+
+    /**
+     * can string be converted to string using (string)$var
+     * @param mixed $var
+     * @return bool
+     */
+    public static function isStringable(mixed $var): bool
+    {
+        return is_string($var)
+            || is_int($var)
+            || is_float($var)
+            || $var instanceof Stringable;
+    }
+
+    /**
+     * Generate any variable to hashable string
      * Use cases use this to md5(Str::hashable(value), or hash('algo',Str::hashable(value))
      *
      * @param mixed ...$hashable
      * @return string
      * @throws ReflectionException
+     * @throws Exception
      */
     public static function hashable(...$hashable): string
     {
@@ -175,27 +206,80 @@ trait StringTrait
             if ($value instanceof Closure) {
                 $ref = new ReflectionFunction($value);
                 $value = $ref->__toString();
-                $value = preg_replace('/\@\@.+/', '', $value);//remove file location
+                $value = preg_replace('/@@.+/', '', $value);//remove file location
                 $value = self::hashable($value, $ref->getStaticVariables());
             }
-            elseif (is_object($value)) {
-                $value = serialize($value);
+
+            elseif ($value instanceof Serializable) {
+                $value = $value->serialize();
             }
-            elseif (is_array($value)) {
-                $arr = $value;
-                $value = [];
-                foreach ($arr as $key => $v) {
-                    $value[] = self::hashable($key) . '-' . self::hashable($v);
+            elseif (is_array($value) || $value instanceof stdClass) {
+                $valueDump = [];
+                foreach ((array)$value as $k => $v) {
+                    $valueDump[self::hashable($k)] = self::hashable($v);
                 }
-                $value = implode('-', $value);
+                $value = serialize($valueDump);
             }
-            elseif (!is_string($value)) {
-                $value = var_export($value, true);
+            elseif (static::isStringable($value)) {
+                $value = (string)$value;
+            }
+            else {
+                $value = static::dump($value);
             }
             $output[] = preg_replace('![\s]+!u', '', $value);
         }
 
         return implode('-', $output);
+    }
+
+    /**
+     * make hash using md5 algorithm
+     * @param ...$hashable
+     * @return string
+     * @throws ReflectionException
+     * @see https://www.php.net/manual/en/function.hash.php
+     */
+    public static function md5(...$hashable): string { return static::hash('md5', ...$hashable); }
+
+    /**
+     * make hash using sha1 algorithm
+     * @param ...$hashable
+     * @return string
+     * @throws ReflectionException
+     * @see https://www.php.net/manual/en/function.hash.php
+     */
+    public static function sha1(...$hashable): string { return static::hash('md5', ...$hashable); }
+
+    /**
+     * make hash using crc32b algorithm
+     * @param ...$hashable
+     * @return string
+     * @throws ReflectionException
+     * @see https://www.php.net/manual/en/function.hash.php
+     */
+    public static function crc32b(...$hashable): string { return static::hash('md5', ...$hashable); }
+
+    /**
+     * make hash using sha512 algorithm
+     * @param ...$hashable
+     * @return string
+     * @throws ReflectionException
+     * @see https://www.php.net/manual/en/function.hash.php
+     */
+    public static function sha512(...$hashable): string { return static::hash('md5', ...$hashable); }
+
+    /**
+     * make hash from any typeof value using $algorithm
+     * @param string $algo
+     * @param ...$hashable
+     * @return string
+     * @throws ReflectionException
+     * @see https://www.php.net/manual/en/function.hash-algos.php
+     * @see https://www.php.net/manual/en/function.hash.php
+     */
+    public static function hash(string $algo = 'md5', ...$hashable): string
+    {
+        return hash($algo, static::hashable(...$hashable));
     }
 
     public static function lower(string $value): string

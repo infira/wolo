@@ -20,7 +20,6 @@ use Closure;
  * @method static void eachTree(callable $callback) Call $callback for every collection, sub collection and every item<br />$callback($itemValue, $itemName, $collectionName)
  * @method static void eachCollection(callable $callback) Call $callback for every collection<br />$callback($Collection, $collectionName)
  * @method static array collections() get this all collections
- * @method static mixed magic(Closure $callback) Execute closure once per $key existence
  * @method static mixed once(mixed ...$keys, callable $callback) Execute $callback once by hash-sum of $parameters
  * @method static bool flush() - Flush current data and collections
  */

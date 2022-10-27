@@ -222,11 +222,13 @@ final class GlobalsCollection
     /**
      * Execute $callback once by hash-sum of $parameters
      *
-     * @param mixed ...$keys - will be used to generate hash sum ID for storing $callback result
+     * @param mixed ...$keys - will be used to generate hash sum ID for storing $callback result <br>
+     * If $keys contains only callback then hash sum will be generated Closure signature
      * @param callable $callback method result will be set to memory for later use
      * @return mixed - $callback result
      * @throws ReflectionException
      * @noinspection PhpDocSignatureInspection
+     * @see Str::hashable()
      */
     public function once(...$keys): mixed
     {
@@ -237,7 +239,11 @@ final class GlobalsCollection
         if (!is_callable($callback)) {
             throw new RuntimeException('last parameter must be callable');
         }
-        $cid = hash("crc32b", Str::hashable($keys));
+        //if at least one key is provided then use only keys to make hashable
+        if (count($keys) > 1) {
+            $keys = array_slice($keys, 0, -1);
+        }
+        $cid = Str::hash("crc32b", ...$keys);
         if (!$this->exists($cid)) {
             $this->set($cid, $callback());
         }
