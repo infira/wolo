@@ -29,7 +29,7 @@ final class GlobalsCollection
      */
     public function of(string $name): GlobalsCollection
     {
-        if (!isset($this->collections[$name])) {
+        if(!isset($this->collections[$name])) {
             $this->collections[$name] = new GlobalsCollection($name);
         }
 
@@ -105,7 +105,7 @@ final class GlobalsCollection
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        if (!$this->exists($key)) {
+        if(!$this->exists($key)) {
             return $default;
         }
 
@@ -120,7 +120,7 @@ final class GlobalsCollection
      */
     public function delete(string $key): bool
     {
-        if ($this->exists($key)) {
+        if($this->exists($key)) {
             unset($this->data[$key]);
         }
 
@@ -155,10 +155,10 @@ final class GlobalsCollection
     #[ArrayShape(['collections' => "array", 'items' => "array"])] public function tree(): array
     {
         $data = ['collections' => []];
-        $this->eachCollection(function ($Collection, $collectionName) use (&$data) {
+        $this->eachCollection(function($Collection, $collectionName) use (&$data) {
             $data['collections'][$collectionName] = ['collections' => [], 'items' => $Collection->getItems()];
             $tree = $Collection->getTree();
-            if ($tree['collections']) {
+            if($tree['collections']) {
                 $data['collections'][$collectionName]['collections'] = $tree['collections'];
             }
         });
@@ -175,8 +175,8 @@ final class GlobalsCollection
      */
     public function each(callable $callback): void
     {
-        foreach ($this->data as $key => $value) {
-            call_user_func($callback, $value, $key);
+        foreach($this->data as $key => $value) {
+            $callback($value, $key);
         }
     }
 
@@ -188,11 +188,11 @@ final class GlobalsCollection
      */
     public function eachTree(callable $callback): void
     {
-        foreach ($this->data as $name => $value) {
-            call_user_func_array($callback, [$value, $name, $this->name]);
+        foreach($this->data as $name => $value) {
+            $callback($value, $name, $this->name);
         }
-        foreach ($this->collections as $name => $Collection) {
-            $Collection->eachTree($callback);
+        foreach($this->collections as $collection) {
+            $collection->eachTree($callback);
         }
     }
 
@@ -204,8 +204,8 @@ final class GlobalsCollection
      */
     public function eachCollection(callable $callback): void
     {
-        foreach ($this->collections as $name => $Collection) {
-            call_user_func_array($callback, [$Collection, $name]);
+        foreach($this->collections as $name => $Collection) {
+            $callback($Collection, $name);
         }
     }
 
@@ -232,19 +232,19 @@ final class GlobalsCollection
      */
     public function once(...$keys): mixed
     {
-        if (!$keys) {
+        if(!$keys) {
             throw new RuntimeException('parameters not defined');
         }
         $callback = $keys[array_key_last($keys)];
-        if (!is_callable($callback)) {
+        if(!is_callable($callback)) {
             throw new RuntimeException('last parameter must be callable');
         }
         //if at least one key is provided then use only keys to make hashable
-        if (count($keys) > 1) {
+        if(count($keys) > 1) {
             $keys = array_slice($keys, 0, -1);
         }
         $cid = Str::hash("crc32b", ...$keys);
-        if (!$this->exists($cid)) {
+        if(!$this->exists($cid)) {
             $this->set($cid, $callback());
         }
 
