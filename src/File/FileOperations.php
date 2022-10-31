@@ -39,13 +39,13 @@ class FileOperations
 
     public function extension(bool $forceLowerCase = false): string
     {
-        if (!$this->file) {
+        if(!$this->file) {
             return '';
         }
 
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
-        if ($forceLowerCase) {
+        if($forceLowerCase) {
             $extension = self::toLower($extension);
         }
 
@@ -59,7 +59,7 @@ class FileOperations
      */
     public function basenameWithoutExtension(): string
     {
-        if (!$this->file) {
+        if(!$this->file) {
             return '';
         }
 
@@ -131,7 +131,7 @@ class FileOperations
      */
     public function move(string $target, bool $overwrite = false): void
     {
-        File::fs()->rename($this->path(), $target, $overwrite);
+        File::fs()->rename($this->file, $target, $overwrite);
     }
 
     /**
@@ -146,12 +146,12 @@ class FileOperations
      */
     public function copy(string $target, bool $overwrite = false): void
     {
-        File::fs()->copy($this->path(), $target, $overwrite);
+        File::fs()->copy($this->file, $target, $overwrite);
     }
 
     private static function toLower(string $string): string
     {
-        if (false !== $encoding = mb_detect_encoding($string)) {
+        if(false !== $encoding = mb_detect_encoding($string)) {
             return mb_strtolower($string, $encoding);
         }
 
