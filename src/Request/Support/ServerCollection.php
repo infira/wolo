@@ -1,41 +1,10 @@
 <?php
 
-namespace Wolo\Request;
+namespace Wolo\Request\Support;
 
 
-class ServerCollection
+class ServerCollection extends RequestVariableCollection
 {
-    private array $data;
-
-    public function __construct(array &$value)
-    {
-        $this->data = &$value;
-    }
-
-    public function all(): array
-    {
-        return $this->data;
-    }
-
-    public function get(string $key, mixed $default = null): mixed
-    {
-        if ($this->exists($key)) {
-            return $this->data[$key];
-        }
-
-        return $default;
-    }
-
-    public function exists(string $key): bool
-    {
-        return array_key_exists($key, $this->data);
-    }
-
-    public function has(string $key): bool
-    {
-        return $this->exists($key);
-    }
-
     public function addr(): ?string { return $this->get('SERVER_ADDR'); }
 
     public function name(): ?string { return $this->get('SERVER_NAME'); }

@@ -3,28 +3,20 @@
 namespace Wolo\Request;
 
 use RuntimeException;
+use Wolo\Request\Support\InstanceShortcuts;
+use Wolo\Request\Support\RequestVariableCollection;
 
-/**
- * @method static array all() - all values from $_COOKIE
- * @method static mixed get(string $key, mixed $default = null) - get from $_COOKIE
- * @method static bool exists(string $key) - does $key exists in $_COOKIE
- * @method static bool has(string $key) - does $key exists in $_COOKIE
- * @method static mixed flush() - flush $_COOKIE
- */
-class Cookie
+class Cookie extends InstanceShortcuts
 {
     private static RequestVariableCollection $_cookie;
 
-    public static function __callStatic(string $name, array $arguments)
+    protected static function instance(): RequestVariableCollection
     {
-        if (in_array($name, ['get', 'set', 'exists', 'has', 'flush'])) {
-            if (!isset(self::$_cookie)) {
-                self::$_cookie = new RequestVariableCollection($_COOKIE);
-            }
-
-            return self::$_cookie->$name(...$arguments);
+        if(!isset(self::$_cookie)) {
+            self::$_cookie = new RequestVariableCollection($_COOKIE);
         }
-        throw new RuntimeException("unknown method('$name')");
+
+        return self::$_cookie;
     }
 
     /**
@@ -39,44 +31,44 @@ class Cookie
     public static function set(string $key, mixed $value, int|string $expires = 0, bool $secure = true): void
     {
         $cookie_host = preg_replace('|^www\.(.*)$|', '.\\1', $_SERVER['HTTP_HOST']);
-        if (is_string($expires)) {
-            if ($expires[0] !== "+") {
+        if(is_string($expires)) {
+            if($expires[0] !== "+") {
                 $expires = "+$expires";
             }
             $expiresInTime = strtotime($expires);
         }
-        elseif (is_numeric($expires)) {
+        elseif(is_numeric($expires)) {
             $expiresInTime = (int)$expires;
         }
         else {
             $expiresInTime = 0;
         }
 
-        if ($expiresInTime === 0) {
+        if($expiresInTime === 0) {
             $expires = 2147483640;
         }
         $_COOKIE[$key] = $value;
         setcookie($key, $value, $expires, "/", $cookie_host, $secure);
     }
 
-    /**
-     * Deletes item from $_COOKIE
-     *
-     * @param string $key
-     * @return void
-     */
-    public static function delete(string $key): void
+    public static function delete(string|int|array $keys): void
     {
-        if (self::exists($key)) {
-            //Actually, there is not a way to directly delete a cookie. Just use setcookie with expiration date in the past, to trigger the removal mechanism in your browser. https://www.pontikis.net/blog/create-cookies-php-javascript
-            unset($_COOKIE[$key]);
-            // empty value and expiration one hour before
-            setcookie($key, '', time() - 3600);
+        foreach((array)$keys as $key) {
+            if(static::has($key)) {
+                //Actually, there is not a way to directly delete a cookie. Just use setcookie with expiration date in the past, to trigger the removal mechanism in your browser. https://www.pontikis.net/blog/create-cookies-php-javascript
+                static::instance()->delete($key);
+                // empty value and expiration one hour before
+                setcookie($key, '', time() - 3600);
+            }
         }
     }
 
-    public static function unset(string $key): void
+    /**
+     * @see static::delete() for replacement
+     * @deprecated
+     */
+    public static function unset(string|int|array $keys): void
     {
-        self::delete($key);
+        self::delete($keys);
     }
 }

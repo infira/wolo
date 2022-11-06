@@ -3,88 +3,26 @@
 namespace Wolo\Request;
 
 use JetBrains\PhpStorm\NoReturn;
-use RuntimeException;
+use Wolo\Request\Support\InstanceShortcuts;
+use Wolo\Request\Support\RequestVariableCollection;
+use Wolo\Request\Support\ServerCollection;
+use Wolo\Request\Support\Traits\FileShortcuts;
+use Wolo\Request\Support\Traits\GetShortcuts;
+use Wolo\Request\Support\Traits\PostShortcuts;
+use Wolo\Request\Support\Traits\ServerShortcuts;
 
-//require_once '../../vendor/autoload.php';
-
-/**
- * @method static array all() - all values from $_REQUEST
- * @method static mixed get(string $key = null, mixed $default = null) - get from $_REQUEST
- * @method static mixed set(string $key, $value) - set to $_REQUEST
- * @method static mixed delete(string $key) - delete from $_REQUEST
- * @method static mixed unset(string $key) - delete from $_REQUEST
- * @method static bool exists(string $key) - does $key exists in $_REQUEST
- * @method static bool has(string $key) - does $key exists in $_REQUEST
- * @method static mixed flush() - flush $_REQUEST
- *
- * @method static array allGET() - all values from $_GET
- * @method static mixed getGET(string $key = null, mixed $default = null) - get from $_GET
- * @method static mixed setGET(string $key, $value) - set to $_GET
- * @method static mixed deleteGET(string $key) - delete from $_GET
- * @method static mixed unsetGET(string $key) - delete from $_GET
- * @method static bool existsGET(string $key) - does $key exists in $_GET
- * @method static bool hasGET(string $key) - does $key exists in $_GET
- * @method static mixed flushGET() - flush $_GET
- *
- * @method static array allPOST() - all values from $_POST
- * @method static mixed getPOST(string $key = null, mixed $default = null) - get from $_POST
- * @method static mixed setPOST(string $key, $value) - set to $_POST
- * @method static mixed deletePOST(string $key) - delete from $_POST
- * @method static mixed unsetPOST(string $key) - delete from $_POST
- * @method static bool existsPOST(string $key) - does $key exists in $_POST
- * @method static bool hasPOST(string $key) - does $key exists in $_POST
- * @method static mixed flushPOST() - flush $_POST
- *
- * @method static array allFILE() - all values from $_FILES
- * @method static mixed getFILE(string $key = null, mixed $default = null) - get from $_FILES
- * @method static mixed setFILE(string $key, $value) - set to $_FILES
- * @method static mixed deleteFILE(string $key) - delete from $_FILES
- * @method static mixed unsetFILE(string $key) - delete from $_FILES
- * @method static bool existsFILE(string $key) - does $key exists in $_FILES
- * @method static bool hasFILE(string $key) - does $key exists in $_FILES
- * @method static mixed flushFILE() - flush $_FILES
- *
- * @method static array allSERVER() - all values from $_SERVER
- * @method static mixed getSERVER(string $key = null, mixed $default = null) - get from $_SERVER
- * @method static mixed setSERVER(string $key, $value) - set to $_SERVER
- * @method static bool existsSERVER(string $key) - does $key exists in $_SERVER
- * @method static bool hasSERVER(string $key) - does $key exists in $_SERVER
- */
-class Http
+class Http extends InstanceShortcuts
 {
-    private static RequestVariableCollection $_request;
-    private static RequestVariableCollection $_post;
-    private static RequestVariableCollection $_get;
-    private static RequestVariableCollection $_file;
-    private static ServerCollection $_server;
+    private static RequestVariableCollection $request;
+    private static RequestVariableCollection $post;
+    private static RequestVariableCollection $get;
+    private static RequestVariableCollection $file;
+    private static ServerCollection $server;
+    use GetShortcuts;
+    use PostShortcuts;
+    use ServerShortcuts;
+    use FileShortcuts;
 
-    public static function __callStatic(string $name, array $arguments)
-    {
-        if (in_array($name, ['get', 'set', 'delete', 'unset', 'exists', 'has', 'flush'])) {
-            return self::request()->$name(...$arguments);
-        }
-        if (in_array($name, ['getPOST', 'setPOST', 'deletePOST', 'unsetPOST', 'existsPOST', 'hasPOST', 'flushPOST'])) {
-            $name = substr($name, 0, -4);
-
-            return self::post()->$name(...$arguments);
-        }
-        if (in_array($name, ['getGET', 'setGET', 'deleteGET', 'unsetGET', 'existsGET', 'hasGET', 'flushGET'])) {
-            $name = substr($name, 0, -3);
-
-            return self::url()->$name(...$arguments);
-        }
-        if (in_array($name, ['getFILE', 'setFILE', 'deleteFILE', 'unsetFILE', 'existsFILE', 'hasFILE', 'flushFILE'])) {
-            $name = substr($name, 0, -4);
-
-            return self::file()->$name(...$arguments);
-        }
-        if (in_array($name, ['getSERVER', 'existsSERVER', 'hasSERVER'])) {
-            $name = substr($name, 0, -6);
-
-            return self::server()->$name(...$arguments);
-        }
-        throw new RuntimeException("unknown method('$name')");
-    }
 
     /**
      * $_SERVER values
@@ -93,11 +31,11 @@ class Http
      */
     public static function post(): RequestVariableCollection
     {
-        if (!isset(self::$_post)) {
-            self::$_post = new RequestVariableCollection($_POST);
+        if(!isset(static::$post)) {
+            static::$post = new RequestVariableCollection($_POST);
         }
 
-        return self::$_post;
+        return static::$post;
     }
 
     /**
@@ -107,11 +45,11 @@ class Http
      */
     public static function request(): RequestVariableCollection
     {
-        if (!isset(self::$_request)) {
-            self::$_request = new RequestVariableCollection($_GET);
+        if(!isset(static::$request)) {
+            static::$request = new RequestVariableCollection($_GET);
         }
 
-        return self::$_request;
+        return static::$request;
     }
 
     /**
@@ -121,11 +59,16 @@ class Http
      */
     public static function url(): RequestVariableCollection
     {
-        if (!isset(self::$_get)) {
-            self::$_get = new RequestVariableCollection($_GET);
+        if(!isset(static::$get)) {
+            static::$get = new RequestVariableCollection($_GET);
         }
 
-        return self::$_get;
+        return static::$get;
+    }
+
+    protected static function instance(): RequestVariableCollection
+    {
+        return static::url();
     }
 
     /**
@@ -135,11 +78,11 @@ class Http
      */
     public static function file(): RequestVariableCollection
     {
-        if (!isset(self::$_file)) {
-            self::$_file = new RequestVariableCollection($_FILES);
+        if(!isset(static::$file)) {
+            static::$file = new RequestVariableCollection($_FILES);
         }
 
-        return self::$_file;
+        return static::$file;
     }
 
     /**
@@ -151,11 +94,11 @@ class Http
      */
     public static function server(): ServerCollection
     {
-        if (!isset(self::$_server)) {
-            self::$_server = new ServerCollection($_SERVER);
+        if(!isset(static::$server)) {
+            static::$server = new ServerCollection($_SERVER);
         }
 
-        return self::$_server;
+        return static::$server;
     }
 
     /**
@@ -165,7 +108,7 @@ class Http
      */
     public static function isPost(): bool
     {
-        return self::requestMethod() === 'post';
+        return static::requestMethod() === 'post';
     }
 
     /**
@@ -175,7 +118,7 @@ class Http
      */
     public static function isPatch(): bool
     {
-        return self::requestMethod() === 'patch';
+        return static::requestMethod() === 'patch';
     }
 
     /**
@@ -185,7 +128,7 @@ class Http
      */
     public static function isOption(): bool
     {
-        return self::requestMethod() === 'option';
+        return static::requestMethod() === 'option';
     }
 
     /**
@@ -197,7 +140,7 @@ class Http
     public static function requestMethod(bool $inLowercase = true): ?string
     {
         $rm = $_SERVER["REQUEST_METHOD"] ?? null;
-        if ($rm && $inLowercase) {
+        if($rm && $inLowercase) {
             $rm = strtolower($rm);
         }
 
@@ -221,10 +164,10 @@ class Http
      */
     public static function acceptJSON(): bool
     {
-        if (!isset($_SERVER['HTTP_ACCEPT'])) {
+        if(!isset($_SERVER['HTTP_ACCEPT'])) {
             return false;
         }
-        if (str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) {
+        if(str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) {
             return true;
         }
 
@@ -250,7 +193,7 @@ class Http
     #[NoReturn] public static function go301(string $link): void
     {
         Header("HTTP/1.1 301 Moved Permanently", true, 301);
-        self::go($link);
+        static::go($link);
     }
 
     /**
@@ -260,21 +203,21 @@ class Http
      */
     #[NoReturn] public static function goToReferer(string $addExtraToRefLink = ''): void
     {
-        $link = self::server()->referer() . $addExtraToRefLink;
-        self::go($link);
+        $link = static::server()->referer() . $addExtraToRefLink;
+        static::go($link);
     }
 
     public static function referer(): ?string
     {
-        return self::server()->referer();
+        return static::server()->referer();
     }
 
     public static function currentUrl(): string
     {
         $url = 'http';
-        if (isset($_SERVER['HTTPS'])) {
+        if(isset($_SERVER['HTTPS'])) {
             $isHttps = strtolower($_SERVER['HTTPS']);
-            if ($isHttps === 'on') {
+            if($isHttps === 'on') {
                 $url .= 's';
             }
         }
@@ -289,7 +232,7 @@ class Http
      */
     public static function host(): ?string
     {
-        return self::server()->host();
+        return static::server()->host();
     }
 
     /**
@@ -300,25 +243,25 @@ class Http
      */
     public static function ip(): string
     {
-        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        if(isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
-        elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
+        elseif(isset($_SERVER['HTTP_X_FORWARDED'])) {
             $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
         }
-        elseif (isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+        elseif(isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
         }
-        elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+        elseif(isset($_SERVER['HTTP_FORWARDED_FOR'])) {
             $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
         }
-        elseif (isset($_SERVER['HTTP_FORWARDED'])) {
+        elseif(isset($_SERVER['HTTP_FORWARDED'])) {
             $ipaddress = $_SERVER['HTTP_FORWARDED'];
         }
-        elseif (isset($_SERVER['REMOTE_ADDR'])) {
+        elseif(isset($_SERVER['REMOTE_ADDR'])) {
             $ipaddress = $_SERVER['REMOTE_ADDR'];
         }
         else {
