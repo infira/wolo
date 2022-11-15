@@ -2,6 +2,8 @@
 
 namespace Wolo;
 
+use Illuminate\Support\Stringable;
+
 class Is
 {
     public static function email(string $email): bool
@@ -37,13 +39,27 @@ class Is
     /**
      * Check if the $nr is between $from AND $to
      *
-     * @param number $nr - nr to check
-     * @param number $from - between start
-     * @param number $to - between end
+     * @param  float|int|string  $nr  - nr to check
+     * @param  float|int|string  $from  - between start
+     * @param  float|int|string  $to  - between end
      * @return boolean
      */
-    public static function between($nr, $from, $to): bool
+    public static function between(float|int|string $nr, float|int|string $from, float|int|string $to): bool
     {
         return ($nr >= $from and $nr <= $to);
+    }
+
+    /** can string be converted to string using (string)*/
+    public static function stringable(mixed $value): bool
+    {
+        return is_string($value)
+            || is_int($value)
+            || is_float($value)
+            || $value instanceof Stringable;
+    }
+
+    public static function match(string $pattern, $subject): bool
+    {
+        return (bool)Regex::match($pattern, $subject);
     }
 }

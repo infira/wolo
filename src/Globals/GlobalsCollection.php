@@ -6,7 +6,7 @@ namespace Wolo\Globals;
 use JetBrains\PhpStorm\ArrayShape;
 use ReflectionException;
 use RuntimeException;
-use Wolo\Str;
+use Wolo\Hash;
 
 final class GlobalsCollection
 {
@@ -24,12 +24,12 @@ final class GlobalsCollection
     /**
      * Generates new collection
      *
-     * @param string $name - collection name
+     * @param  string  $name  - collection name
      * @return GlobalsCollection
      */
     public function of(string $name): GlobalsCollection
     {
-        if(!isset($this->collections[$name])) {
+        if (!isset($this->collections[$name])) {
             $this->collections[$name] = new GlobalsCollection($name);
         }
 
@@ -49,7 +49,7 @@ final class GlobalsCollection
     /**
      * Checks if the item exists by key
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     public function exists(string $key): bool
@@ -68,8 +68,8 @@ final class GlobalsCollection
     /**
      * Set new item
      *
-     * @param string $key
-     * @param mixed $value
+     * @param  string  $key
+     * @param  mixed  $value
      * @return void
      */
     public function set(string $key, mixed $value): void
@@ -80,7 +80,7 @@ final class GlobalsCollection
     /**
      * Add new item
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return void
      */
     public function add(mixed $value): void
@@ -99,13 +99,13 @@ final class GlobalsCollection
     /**
      * Get item, if not found $returnOnNotFound will be returned
      *
-     * @param string $key
-     * @param mixed $default - if not found then that is returned
+     * @param  string  $key
+     * @param  mixed  $default  - if not found then that is returned
      * @return mixed/bool
      */
     public function get(string $key, mixed $default = null): mixed
     {
-        if(!$this->exists($key)) {
+        if (!$this->exists($key)) {
             return $default;
         }
 
@@ -115,12 +115,12 @@ final class GlobalsCollection
     /**
      * delete bye key
      *
-     * @param string $key
+     * @param  string  $key
      * @return bool
      */
     public function delete(string $key): bool
     {
-        if($this->exists($key)) {
+        if ($this->exists($key)) {
             unset($this->data[$key]);
         }
 
@@ -155,10 +155,10 @@ final class GlobalsCollection
     #[ArrayShape(['collections' => "array", 'items' => "array"])] public function tree(): array
     {
         $data = ['collections' => []];
-        $this->eachCollection(function($Collection, $collectionName) use (&$data) {
+        $this->eachCollection(function ($Collection, $collectionName) use (&$data) {
             $data['collections'][$collectionName] = ['collections' => [], 'items' => $Collection->getItems()];
             $tree = $Collection->getTree();
-            if($tree['collections']) {
+            if ($tree['collections']) {
                 $data['collections'][$collectionName]['collections'] = $tree['collections'];
             }
         });
@@ -170,12 +170,12 @@ final class GlobalsCollection
     /**
      * Call $callback for every item in current collection<br />$callback($itemValue,$itemName)
      *
-     * @param callable $callback
+     * @param  callable  $callback
      * @return void
      */
     public function each(callable $callback): void
     {
-        foreach($this->data as $key => $value) {
+        foreach ($this->data as $key => $value) {
             $callback($value, $key);
         }
     }
@@ -183,15 +183,15 @@ final class GlobalsCollection
     /**
      * Call $callback for every collection, sub collection and every item<br />$callback($itemValue,$itemName,$collectionName)
      *
-     * @param callable $callback
+     * @param  callable  $callback
      * @return void
      */
     public function eachTree(callable $callback): void
     {
-        foreach($this->data as $name => $value) {
+        foreach ($this->data as $name => $value) {
             $callback($value, $name, $this->name);
         }
-        foreach($this->collections as $collection) {
+        foreach ($this->collections as $collection) {
             $collection->eachTree($callback);
         }
     }
@@ -199,12 +199,12 @@ final class GlobalsCollection
     /**
      * Call $callback for every collection<br />$callback($Collection,$collectionName)
      *
-     * @param callable $callback
+     * @param  callable  $callback
      * @return void
      */
     public function eachCollection(callable $callback): void
     {
-        foreach($this->collections as $name => $Collection) {
+        foreach ($this->collections as $name => $Collection) {
             $callback($Collection, $name);
         }
     }
@@ -222,29 +222,29 @@ final class GlobalsCollection
     /**
      * Execute $callback once by hash-sum of $parameters
      *
-     * @param mixed ...$keys - will be used to generate hash sum ID for storing $callback result <br>
+     * @param  mixed  ...$keys  - will be used to generate hash sum ID for storing $callback result <br>
      * If $keys contains only callback then hash sum will be generated Closure signature
-     * @param callable $callback method result will be set to memory for later use
+     * @param  callable  $callback  method result will be set to memory for later use
      * @return mixed - $callback result
      * @throws ReflectionException
      * @noinspection PhpDocSignatureInspection
-     * @see Str::hashable()
+     * @see Hash::hashable()
      */
     public function once(...$keys): mixed
     {
-        if(!$keys) {
+        if (!$keys) {
             throw new RuntimeException('parameters not defined');
         }
         $callback = $keys[array_key_last($keys)];
-        if(!is_callable($callback)) {
+        if (!is_callable($callback)) {
             throw new RuntimeException('last parameter must be callable');
         }
         //if at least one key is provided then use only keys to make hashable
-        if(count($keys) > 1) {
+        if (count($keys) > 1) {
             $keys = array_slice($keys, 0, -1);
         }
-        $cid = Str::hash("crc32b", ...$keys);
-        if(!$this->exists($cid)) {
+        $cid = Hash::crc32b(...$keys);
+        if (!$this->exists($cid)) {
             $this->set($cid, $callback());
         }
 
