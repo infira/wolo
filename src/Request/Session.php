@@ -2,10 +2,10 @@
 
 namespace Wolo\Request;
 
+use Wolo\Request\Support\InstanceShortcuts;
 use Wolo\Request\Support\RequestVariableCollection;
-use Wolo\Request\Traits\InstanceMethods;
 
-class Session extends InstanceMethods
+class Session extends InstanceShortcuts
 {
     protected static string|null $SID = null;
 
@@ -29,7 +29,7 @@ class Session extends InstanceMethods
 
     protected static function instance(): RequestVariableCollection
     {
-        if(!isset(static::$_session)) {
+        if (!isset(static::$_session)) {
             static::$_session = new RequestVariableCollection($_SESSION);
         }
 
@@ -39,18 +39,18 @@ class Session extends InstanceMethods
     /**
      * Config sessions
      *
-     * @param string $sessionName - name of the PHP session
-     * @param string|null $SID start or restore session with own provided session ID,
+     * @param  string  $sessionName  - name of the PHP session
+     * @param  string|null  $SID  start or restore session with own provided session ID,
      */
     public static function init(string $sessionName = 'PHPSESSID', string $SID = null): void
     {
-        if($sessionName !== 'PHPSESSID') {
+        if ($sessionName !== 'PHPSESSID') {
             $sessionName = "PHPSESSID_$sessionName";
         }
         static::$sessionName = $sessionName;
-        if(!static::$isStarted) {
+        if (!static::$isStarted) {
             static::$isStarted = true;
-            if((int)ini_get('session.auto_start') === 0) {
+            if ((int)ini_get('session.auto_start') === 0) {
                 static::start($SID);
             }
         }
@@ -59,7 +59,7 @@ class Session extends InstanceMethods
 
         $upTime = static::get('_sessionUpdateTime', time());
         $between = time() - $upTime;
-        if($between > static::$timeout && $upTime > 0) {
+        if ($between > static::$timeout && $upTime > 0) {
             static::destroy(true);
             static::$isExpired = true;
         }
@@ -85,7 +85,7 @@ class Session extends InstanceMethods
     /**
      * Set a 32bit session id hash
      *
-     * @param string $SID
+     * @param  string  $SID
      */
     private static function setSID(string $SID): void
     {
@@ -95,21 +95,21 @@ class Session extends InstanceMethods
     /**
      * Destroy session
      *
-     * @param bool $takeNewID - take new session ID
+     * @param  bool  $takeNewID  - take new session ID
      */
     public static function destroy(bool $takeNewID = true): void
     {
         static::flush();
         session_unset();
         session_destroy();
-        if(static::$sessionName) {
+        if (static::$sessionName) {
             setcookie(static::$sessionName, '', 1);
             session_name(static::$sessionName);
             session_set_cookie_params(static::$timeout);
         }
         static::start(); //start new session
         //take new session ID
-        if($takeNewID) {
+        if ($takeNewID) {
             session_regenerate_id(true);
             $SID = session_id();
             static::setSID($SID);
@@ -128,14 +128,14 @@ class Session extends InstanceMethods
      */
     private static function doStart(): bool
     {
-        if(Cookie::has(static::$sessionName)) {
+        if (Cookie::has(static::$sessionName)) {
             $sessid = Cookie::get(static::$sessionName);
         }
         else {
             return session_start();
         }
 
-        if(!preg_match('/^[a-zA-Z0-9,\-]{22,40}$/', $sessid)) {
+        if (!preg_match('/^[a-zA-Z0-9,\-]{22,40}$/', $sessid)) {
             return false;
         }
 
@@ -144,15 +144,15 @@ class Session extends InstanceMethods
 
     private static function start(string $SID = null): void
     {
-        if($SID) {
+        if ($SID) {
             session_id($SID);
             Cookie::set(static::$sessionName, $SID);
         }
-        if(static::$sessionName) {
+        if (static::$sessionName) {
             session_name(static::$sessionName);
         }
         session_set_cookie_params(static::$timeout);
-        if(!static::doStart()) {
+        if (!static::doStart()) {
             session_id(uniqid('', true));
             session_start();
             session_regenerate_id();
@@ -170,7 +170,7 @@ class Session extends InstanceMethods
     }
 
     /**
-     * @param int $timeout
+     * @param  int  $timeout
      */
     public static function setTimeout(int $timeout): void
     {
