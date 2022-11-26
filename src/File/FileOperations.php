@@ -29,7 +29,7 @@ class FileOperations
     /**
      * Creates new SplFileInfo object of a file
      *
-     * @param string $file
+     * @param  string  $file
      * @return SplFileInfo
      */
     public static function info(string $file): SplFileInfo
@@ -39,13 +39,13 @@ class FileOperations
 
     public function extension(bool $forceLowerCase = false): string
     {
-        if(!$this->file) {
+        if (!$this->file) {
             return '';
         }
 
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
-        if($forceLowerCase) {
+        if ($forceLowerCase) {
             $extension = self::toLower($extension);
         }
 
@@ -59,7 +59,7 @@ class FileOperations
      */
     public function basenameWithoutExtension(): string
     {
-        if(!$this->file) {
+        if (!$this->file) {
             return '';
         }
 
@@ -99,7 +99,7 @@ class FileOperations
     /**
      * Put file content using php file_put_contents
      *
-     * @param string $content
+     * @param  string  $content
      * @return int - number of bytes written
      */
     public function put(string $content): int
@@ -120,7 +120,7 @@ class FileOperations
     public function rename(string $newName, string $newExtension = null): void
     {
         $newExtension = $newExtension ?: $this->extension();
-        File::fs()->rename($this->file, $this->path() . '/' . $newName . '.' . $newExtension);
+        File::fs()->rename($this->file, $this->path().'/'.$newName.'.'.$newExtension);
     }
 
     /**
@@ -151,7 +151,7 @@ class FileOperations
 
     private static function toLower(string $string): string
     {
-        if(false !== $encoding = mb_detect_encoding($string)) {
+        if (false !== $encoding = mb_detect_encoding($string)) {
             return mb_strtolower($string, $encoding);
         }
 

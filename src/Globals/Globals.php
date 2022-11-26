@@ -29,12 +29,12 @@ class Globals
     private static array $collections = [];
 
     /**
-     * @param string $key - collection name
+     * @param  string  $key  - collection name
      * @return GlobalsCollection
      */
     public static function of(string $key): GlobalsCollection
     {
-        if(!isset(self::$collections[$key])) {
+        if (!isset(self::$collections[$key])) {
             self::$collections[$key] = new GlobalsCollection($key);
         }
 

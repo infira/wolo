@@ -17,14 +17,14 @@ use Wolo\Globals\Globals;
 class Prof
 {
     /**
-     * @param string $name
+     * @param  string  $name
      * @return Profiler
      */
     public static function of(string $name = "globalProfiler"): Profiler
     {
         return Globals::once('woloProfiler', $name, static function () {
             return new Profiler();
-        }); 
+        });
     }
 
     public static function __callStatic(string $name, array $arguments)

@@ -13,7 +13,7 @@ class Folder
     /**
      * Delete a folder including all its content
      *
-     * @param string $path
+     * @param  string  $path
      * @throws Exception
      */
     public static function delete(string $path): void
@@ -24,7 +24,7 @@ class Folder
     /**
      * Flush folder content
      *
-     * @param string $path
+     * @param  string  $path
      * @throws Exception
      */
     public static function flush(string $path): void
@@ -35,8 +35,8 @@ class Folder
     /**
      * If folder doest no exists make it
      *
-     * @param string $path
-     * @param int $chmod - chmod it
+     * @param  string  $path
+     * @param  int  $chmod  - chmod it
      * @return string created dir path
      * @throws Exception
      */
@@ -61,8 +61,8 @@ class Folder
     /**
      * Find only files inside folder
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -74,8 +74,8 @@ class Folder
     /**
      * Find only files inside folder recursively
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression OR simple string pattern with asterisks as wildcard, OR use ^ to mark start of the string OR $ to end of the string
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression OR simple string pattern with asterisks as wildcard, OR use ^ to mark start of the string OR $ to end of the string
      * @return array
      * @throws Exception
      */
@@ -87,8 +87,8 @@ class Folder
     /**
      * Find only folders inside folder
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -100,8 +100,8 @@ class Folder
     /**
      * Find only folders inside folder recursively
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -113,8 +113,8 @@ class Folder
     /**
      * Get filenames side folder
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -126,8 +126,8 @@ class Folder
     /**
      * Get files and sub folders inside path
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array - array with absolute paths
      * @throws Exception
      */
@@ -139,8 +139,8 @@ class Folder
     /**
      * Get files and sub folders inside path recursively
      *
-     * @param string $path
-     * @param string ...$filterPatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array - array with absolute paths
      * @throws Exception
      */
@@ -152,8 +152,8 @@ class Folder
     /**
      * Find only files inside folder excluding patterns
      *
-     * @param string $path
-     * @param string ...$excludePatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -165,8 +165,8 @@ class Folder
     /**
      * Find only files inside folder recursively excluding patterns
      *
-     * @param string $path
-     * @param string ...$excludePatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -178,8 +178,8 @@ class Folder
     /**
      * Find only folders inside folder excluding patterns
      *
-     * @param string $path
-     * @param string ...$excludePatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -191,8 +191,8 @@ class Folder
     /**
      * Find only folders inside folder recursively excluding patterns
      *
-     * @param string $path
-     * @param string ...$excludePatterns a regular expression or simple string pattern with asterisks as wildcard
+     * @param  string  $path
+     * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
      * @throws Exception
      */
@@ -204,8 +204,8 @@ class Folder
     /**
      * Get files and sub folders inside path excluding patterns
      *
-     * @param string $path
-     * @param array $excludePatterns
+     * @param  string  $path
+     * @param  array  $excludePatterns
      * @return array - array with absolute paths
      * @throws Exception
      */
@@ -217,8 +217,8 @@ class Folder
     /**
      * Get files and sub folders inside path recursively excluding patterns
      *
-     * @param string $path
-     * @param array $filterPatterns
+     * @param  string  $path
+     * @param  array  $filterPatterns
      * @return array - array with absolute paths
      * @throws Exception
      */
@@ -275,7 +275,7 @@ class Folder
         $patterns = (array)$patterns;
 
         foreach ($patterns as $pattern) {
-            if (preg_match('/' . $pattern . '\z/u', $str) === 1 && (Str::endsWith($pattern, '$') || Str::startsWith($pattern, '^'))) {
+            if (preg_match('/'.$pattern.'\z/u', $str) === 1 && (Str::endsWith($pattern, '$') || Str::startsWith($pattern, '^'))) {
                 return true;
             }
             if (Str::is($pattern, $str)) {

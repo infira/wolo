@@ -44,7 +44,7 @@ class DateDriver
     /**
      * Format to d m Y separated by $separator
      *
-     * @param string $separator = '.'
+     * @param  string  $separator  = '.'
      * @return string
      */
     public function dmy(string $separator = '.'): string

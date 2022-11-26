@@ -19,10 +19,10 @@ class RequestVariableCollection
 
     public function get(string $key = null, mixed $default = null): mixed
     {
-        if($key === null) {
+        if ($key === null) {
             return $this->data;
         }
-        if($this->has($key)) {
+        if ($this->has($key)) {
             return $this->data[$key];
         }
 
@@ -41,8 +41,8 @@ class RequestVariableCollection
 
     public function delete(string|int|array $keys): void
     {
-        foreach((array)$keys as $key) {
-            if($this->has($key)) {
+        foreach ((array)$keys as $key) {
+            if ($this->has($key)) {
                 unset($this->data[$key]);
             }
         }

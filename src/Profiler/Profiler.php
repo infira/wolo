@@ -47,8 +47,8 @@ class Profiler
      * Start an individual timer
      * This will pause the running timer and place it on a stack.
      *
-     * @param string $name name of the timer
-     * @param string $desc optional $desc description of the timer
+     * @param  string  $name  name of the timer
+     * @param  string  $desc  optional $desc description of the timer
      * @return void
      */
     public function start(string $name, string $desc = ""): void
@@ -73,7 +73,7 @@ class Profiler
      * Stop an individual timer
      * Restart the timer that was running before this one
      *
-     * @param string $name name of the timer
+     * @param  string  $name  name of the timer
      * @return void
      */
     public function stop(string $name): void
@@ -102,7 +102,7 @@ class Profiler
     /**
      * measure the elapsed time of a timer without stoping the timer if
      *
-     * @param string $name
+     * @param  string  $name
      * @return float
      */
     public function elapsedTime(string $name): float
@@ -147,7 +147,7 @@ class Profiler
             $perc = ($total / $oaTime) * 100;
             $tot_perc += $perc;
             if (strpos($key, 'function')) {
-                $key = '<strong style="color:#CC0000">' . $key . '</strong>';
+                $key = '<strong style="color:#CC0000">'.$key.'</strong>';
             }
             $list[] = ['nr' => $nr, 'calls' => sprintf("%3d", $count), 'time' => $total, 'percent' => sprintf("%3.2f", $perc), 'name' => $key];
         }
@@ -166,11 +166,11 @@ class Profiler
         $nr = 1;
         foreach ($list as $val) {
             $return .= '<tr style="background-color:#FFFFFF">';
-            $return .= '<td> ' . $nr . ' </td>';
-            $return .= '<td> ' . $val['calls'] . ' </td>';
-            $return .= '<td> ' . sprintf("%3.6f", $val['time']) . ' </td>';
-            $return .= '<td> ' . $val['percent'] . ' </td>';
-            $return .= '<td> ' . $val['name'] . ' </td>';
+            $return .= '<td> '.$nr.' </td>';
+            $return .= '<td> '.$val['calls'].' </td>';
+            $return .= '<td> '.sprintf("%3.6f", $val['time']).' </td>';
+            $return .= '<td> '.$val['percent'].' </td>';
+            $return .= '<td> '.$val['name'].' </td>';
             $return .= '</tr>';
             $nr++;
         }
@@ -220,9 +220,9 @@ class Profiler
     /**
      * Sort array by fields
      *
-     * @param array $data
-     * @param string $field
-     * @param bool $descending
+     * @param  array  $data
+     * @param  string  $field
+     * @param  bool  $descending
      * @throws Exception
      */
     private function orderByField(array &$data, string $field, bool $descending = false): void
@@ -231,7 +231,7 @@ class Profiler
 
         foreach ($data as $key => $value) {
             if (!isset($value[$field])) {
-                throw new RuntimeException($field . ' is missing in the sortable array');
+                throw new RuntimeException($field.' is missing in the sortable array');
             }
             $va = $value[$field];
             if ($field === "percent") {
@@ -259,7 +259,7 @@ class Profiler
     /**
      * resume  an individual timer
      *
-     * @param string $name
+     * @param  string  $name
      * @return void
      */
     private function resumeTimer(string $name): void
@@ -271,7 +271,7 @@ class Profiler
     /**
      * suspend  an individual timer
      *
-     * @param string $name
+     * @param  string  $name
      * @return void
      */
     private function suspendTimer(string $name): void

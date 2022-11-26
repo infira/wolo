@@ -48,7 +48,7 @@ class File
     /**
      * Delete file(s)
      *
-     * @param iterable|string ...$files
+     * @param  iterable|string  ...$files
      * @throws IOException
      */
     public static function delete(iterable|string ...$files): bool

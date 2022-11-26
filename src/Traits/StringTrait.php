@@ -16,9 +16,9 @@ trait StringTrait
     /**
      * Simple string templating
      *
-     * @param string $string
-     * @param array $vars
-     * @param string $syntax
+     * @param  string  $string
+     * @param  array  $vars
+     * @param  string  $syntax
      * @return string
      */
     public static function vars(string $string, array $vars, string $syntax = '{}'): string
@@ -26,7 +26,7 @@ trait StringTrait
         $start = $syntax[0];
         $end = $syntax[1] ?? $syntax[0];
         foreach ($vars as $name => $value) {
-            $string = str_replace([$start . $name . $end], $value, $string);
+            $string = str_replace([$start.$name.$end], $value, $string);
         }
 
         return $string;
@@ -46,8 +46,8 @@ trait StringTrait
      * Determine if a given string matches a given pattern.
      * Used Laravel Str::is for based, added little more functionality, it detects if pattern is already regular expression
      *
-     * @param string|array $patterns
-     * @param string $value
+     * @param  string|array  $patterns
+     * @param  string  $value
      * @return bool
      * @author https://github.com/illuminate/support/blob/master/Str.php
      */
@@ -79,7 +79,7 @@ trait StringTrait
             // pattern such as "library/*", making any string check convenient.
             $pattern = str_replace('\*', '.*', $pattern);
 
-            if (preg_match('#^' . $pattern . '\z#u', $value) === 1) {
+            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
                 return true;
             }
         }
@@ -91,19 +91,19 @@ trait StringTrait
      * generate document no from ID
      * e.g. ID of docNo(1234,6) becomes 001234
      *
-     * @param int $documentID
-     * @param int $length
+     * @param  int  $documentID
+     * @param  int  $length
      * @return string
      */
     public static function docNo(int $documentID, int $length = 6): string
     {
-        return str_repeat("0", ($length - strlen($documentID))) . $documentID;
+        return str_repeat("0", ($length - strlen($documentID))).$documentID;
     }
 
     /**
      * Turns \My\CoolNamespace\MyClass into myClass
      *
-     * @param string|object $class
+     * @param  string|object  $class
      * @return string
      */
     public static function classBasename(string|object $class): string
@@ -120,9 +120,11 @@ trait StringTrait
      */
     public static function UUID(): string
     {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',        // 32 bits for
+        return sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',        // 32 bits for
             // "time_low"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
 
             // 16 bits for "time_mid"
             mt_rand(0, 0xffff),
@@ -137,13 +139,16 @@ trait StringTrait
             mt_rand(0, 0x3fff) | 0x8000,
 
             // 48 bits for "node"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff));
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff),
+            mt_rand(0, 0xffff)
+        );
     }
 
     /**
      * Generate a more truly "random" alpha-numeric string.
      *
-     * @param int $length
+     * @param  int  $length
      * @return string
      * @throws Exception
      * @author https://github.com/illuminate/support/blob/master/Str.php
@@ -166,7 +171,7 @@ trait StringTrait
     /**
      * Dump variable into printable string
      *
-     * @param mixed $var
+     * @param  mixed  $var
      * @return string
      */
     public static function dump(mixed $var): string
@@ -179,7 +184,7 @@ trait StringTrait
 
     /**
      * can string be converted to string using (string)$var
-     * @param mixed $var
+     * @param  mixed  $var
      * @return bool
      */
     public static function isStringable(mixed $var): bool
@@ -194,7 +199,7 @@ trait StringTrait
      * Generate any variable to hashable string
      * Use cases use this to md5(Str::hashable(value), or hash('algo',Str::hashable(value))
      *
-     * @param mixed ...$hashable
+     * @param  mixed  ...$hashable
      * @return string
      * @throws ReflectionException
      * @throws Exception
@@ -270,7 +275,7 @@ trait StringTrait
 
     /**
      * make hash from any typeof value using $algorithm
-     * @param string $algo
+     * @param  string  $algo
      * @param ...$hashable
      * @return string
      * @throws ReflectionException

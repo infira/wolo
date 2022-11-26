@@ -31,7 +31,7 @@ class Http extends InstanceShortcuts
      */
     public static function post(): RequestVariableCollection
     {
-        if(!isset(static::$post)) {
+        if (!isset(static::$post)) {
             static::$post = new RequestVariableCollection($_POST);
         }
 
@@ -45,7 +45,7 @@ class Http extends InstanceShortcuts
      */
     public static function request(): RequestVariableCollection
     {
-        if(!isset(static::$request)) {
+        if (!isset(static::$request)) {
             static::$request = new RequestVariableCollection($_GET);
         }
 
@@ -59,7 +59,7 @@ class Http extends InstanceShortcuts
      */
     public static function url(): RequestVariableCollection
     {
-        if(!isset(static::$get)) {
+        if (!isset(static::$get)) {
             static::$get = new RequestVariableCollection($_GET);
         }
 
@@ -78,7 +78,7 @@ class Http extends InstanceShortcuts
      */
     public static function file(): RequestVariableCollection
     {
-        if(!isset(static::$file)) {
+        if (!isset(static::$file)) {
             static::$file = new RequestVariableCollection($_FILES);
         }
 
@@ -94,7 +94,7 @@ class Http extends InstanceShortcuts
      */
     public static function server(): ServerCollection
     {
-        if(!isset(static::$server)) {
+        if (!isset(static::$server)) {
             static::$server = new ServerCollection($_SERVER);
         }
 
@@ -134,13 +134,13 @@ class Http extends InstanceShortcuts
     /**
      * Get request method $_SERVER["REQUEST_METHOD"]
      *
-     * @param bool $inLowercase
+     * @param  bool  $inLowercase
      * @return string|null
      */
     public static function requestMethod(bool $inLowercase = true): ?string
     {
         $rm = $_SERVER["REQUEST_METHOD"] ?? null;
-        if($rm && $inLowercase) {
+        if ($rm && $inLowercase) {
             $rm = strtolower($rm);
         }
 
@@ -164,10 +164,10 @@ class Http extends InstanceShortcuts
      */
     public static function acceptJSON(): bool
     {
-        if(!isset($_SERVER['HTTP_ACCEPT'])) {
+        if (!isset($_SERVER['HTTP_ACCEPT'])) {
             return false;
         }
-        if(str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) {
+        if (str_contains($_SERVER['HTTP_ACCEPT'], 'application/json')) {
             return true;
         }
 
@@ -177,18 +177,18 @@ class Http extends InstanceShortcuts
     /**
      * Got to link
      *
-     * @param string $link - where to go
+     * @param  string  $link  - where to go
      */
     #[NoReturn] public static function go(string $link): void
     {
-        header('Location: ' . str_replace('&amp;', '&', $link));
+        header('Location: '.str_replace('&amp;', '&', $link));
         exit;
     }
 
     /**
      * Redirect page using 301 header
      *
-     * @param string $link - where to go
+     * @param  string  $link  - where to go
      */
     #[NoReturn] public static function go301(string $link): void
     {
@@ -199,11 +199,11 @@ class Http extends InstanceShortcuts
     /**
      * Redirect to referer url
      *
-     * @param string $addExtraToRefLink - add extra params to link
+     * @param  string  $addExtraToRefLink  - add extra params to link
      */
     #[NoReturn] public static function goToReferer(string $addExtraToRefLink = ''): void
     {
-        $link = static::server()->referer() . $addExtraToRefLink;
+        $link = static::server()->referer().$addExtraToRefLink;
         static::go($link);
     }
 
@@ -215,14 +215,14 @@ class Http extends InstanceShortcuts
     public static function currentUrl(): string
     {
         $url = 'http';
-        if(isset($_SERVER['HTTPS'])) {
+        if (isset($_SERVER['HTTPS'])) {
             $isHttps = strtolower($_SERVER['HTTPS']);
-            if($isHttps === 'on') {
+            if ($isHttps === 'on') {
                 $url .= 's';
             }
         }
 
-        return $url . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        return $url.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
     }
 
     /**
@@ -243,25 +243,25 @@ class Http extends InstanceShortcuts
      */
     public static function ip(): string
     {
-        if(isset($_SERVER['HTTP_CLIENT_IP'])) {
+        if (isset($_SERVER['HTTP_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
         }
-        elseif(isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        elseif (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
             $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
         }
-        elseif(isset($_SERVER['HTTP_X_FORWARDED'])) {
+        elseif (isset($_SERVER['HTTP_X_FORWARDED'])) {
             $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
         }
-        elseif(isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
+        elseif (isset($_SERVER['HTTP_X_CLUSTER_CLIENT_IP'])) {
             $ipaddress = $_SERVER['HTTP_X_CLUSTER_CLIENT_IP'];
         }
-        elseif(isset($_SERVER['HTTP_FORWARDED_FOR'])) {
+        elseif (isset($_SERVER['HTTP_FORWARDED_FOR'])) {
             $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
         }
-        elseif(isset($_SERVER['HTTP_FORWARDED'])) {
+        elseif (isset($_SERVER['HTTP_FORWARDED'])) {
             $ipaddress = $_SERVER['HTTP_FORWARDED'];
         }
-        elseif(isset($_SERVER['REMOTE_ADDR'])) {
+        elseif (isset($_SERVER['REMOTE_ADDR'])) {
             $ipaddress = $_SERVER['REMOTE_ADDR'];
         }
         else {

@@ -32,7 +32,7 @@ class ClassFarm
     /**
      * Does farmer exists
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public static function exists(string $name): bool
@@ -43,7 +43,7 @@ class ClassFarm
     /**
      * Is farmer constructed
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public static function constructed(string $name): bool
@@ -54,7 +54,7 @@ class ClassFarm
     /**
      * Delete farmer
      *
-     * @param string $name
+     * @param  string  $name
      * @return void
      */
     public static function remove(string $name): void

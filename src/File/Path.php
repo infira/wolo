@@ -7,7 +7,7 @@ class Path
     /**
      * Add trailing slash if not exists
      *
-     * @param string $path
+     * @param  string  $path
      * @return string
      */
     public static function slash(string $path): string
@@ -27,7 +27,7 @@ class Path
      * Join path parts together into a canonical path.
      *
      * @author https://github.com/symfony/symfony/blob/6.0/src/Symfony/Component/Filesystem/Path.php
-     * @param string ...$paths
+     * @param  string  ...$paths
      * @return string
      */
     public static function join(string ...$paths): string

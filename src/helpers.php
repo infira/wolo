@@ -22,7 +22,7 @@ if (!function_exists('getTrace')) {
         $nr = 1;
         for ($i = $startAt; $i <= $until; $i++) {
             if (isset($backTrace[$i]['file'])) {
-                $trace[$nr] = str_replace(getcwd(), "", $backTrace[$i]['file']) . ' : ' . $backTrace[$i]['line'];
+                $trace[$nr] = str_replace(getcwd(), "", $backTrace[$i]['file']).' : '.$backTrace[$i]['line'];
                 $nr++;
             }
         }

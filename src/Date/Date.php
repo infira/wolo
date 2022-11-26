@@ -33,8 +33,8 @@ class Date
     /**
      * Constructs DateTime objet
      *
-     * @param string|int $datetime
-     * @param DateTimeZone|null $timezone
+     * @param  string|int  $datetime
+     * @param  DateTimeZone|null  $timezone
      * @return DateDriver
      */
     public static function of(string|int $datetime = 'now', ?DateTimeZone $timezone = null): DateDriver
@@ -60,8 +60,8 @@ class Date
     /**
      * convert to timestamp
      *
-     * @param string|int $time
-     * @param string|int|null $now - use base time or string, defaults to now ($now is converted to time)
+     * @param  string|int  $time
+     * @param  string|int|null  $now  - use base time or string, defaults to now ($now is converted to time)
      * @return int - converted timestamp
      */
     public static function time(string|int $time, string|int $now = null): int
@@ -77,7 +77,7 @@ class Date
     /**
      * Get last of the month date
      *
-     * @param string|null $date - date to time
+     * @param  string|null  $date  - date to time
      * @return int
      */
     public static function lastDayOfMonth(string $date = null): int
@@ -89,9 +89,9 @@ class Date
      * Count days between dates
      * $ignore ignore day numbers like sunday = 7
      *
-     * @param string|null $start - null means now
-     * @param string|null $endDate - null means now
-     * @param array $ignore
+     * @param  string|null  $start  - null means now
+     * @param  string|null  $endDate  - null means now
+     * @param  array  $ignore
      * @return int
      */
     public static function daysBetween(string $start = null, string $endDate = null, array $ignore = []): int
@@ -113,10 +113,10 @@ class Date
     /**
      * Get array range with dates
      *
-     * @param string|int $from - null means now
-     * @param string|int $to - null means now
-     * @param string $step - how many times to add each step
-     * @param string $format - format range item
+     * @param  string|int  $from  - null means now
+     * @param  string|int  $to  - null means now
+     * @param  string  $step  - how many times to add each step
+     * @param  string  $format  - format range item
      * @return string[]
      */
     public static function range(string|int $from, string|int $to, string $step = '+1 day', string $format = 'd.m.Y'): array
@@ -146,7 +146,7 @@ class Date
     /**
      * if $date is actual date
      *
-     * @param string $date
+     * @param  string  $date
      * @return bool
      */
     public static function is(string $date): bool

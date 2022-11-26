@@ -41,7 +41,7 @@ class VarDumper
 
     public static function pre($var): string
     {
-        return '<pre>' . self::dump($var) . '</pre>';
+        return '<pre>'.self::dump($var).'</pre>';
     }
 
     public static function console($var): string
@@ -52,7 +52,7 @@ class VarDumper
     /**
      * Dump variable into printable string
      *
-     * @param mixed $var
+     * @param  mixed  $var
      * @return string
      */
     public static function dump(mixed $var): string

@@ -10,8 +10,8 @@ class Reflection
     /**
      * get class traits
      *
-     * @param string|object $objectOrClass
-     * @param int $depth - check also parents traits, 0 all teh way to to last parent
+     * @param  string|object  $objectOrClass
+     * @param  int  $depth  - check also parents traits, 0 all teh way to to last parent
      * @return array
      * @throws ReflectionException
      */
@@ -35,9 +35,9 @@ class Reflection
     /**
      * Does class has trait
      *
-     * @param string|object $objectOrClass
-     * @param string|object $findObjectOrClass
-     * @param bool $checkParents
+     * @param  string|object  $objectOrClass
+     * @param  string|object  $findObjectOrClass
+     * @param  bool  $checkParents
      * @return bool
      * @throws ReflectionException
      */
