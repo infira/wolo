@@ -3,23 +3,24 @@
   "description": "Collection of php utils and shortcuts",
   "type": "library",
   "authors": [
-	{
-	  "name": "gen.taliaru",
-	  "email": "gen@infira.ee"
-	}
+    {
+      "name": "gen.taliaru",
+      "email": "gen@infira.ee"
+    }
   ],
   "autoload": {
-	"files": [ "src/helpers.php" ],
-	"psr-4": {
-	  "Wolo\\": "src/"
-	}
+    "files": [
+      "src/helpers.php"
+    ],
+    "psr-4": {
+      "Wolo\\": "src/"
+    }
   },
   "minimum-stability": "stable",
   "require": {
-	"php": ">=8.0.2"
+    "php": ">=8.0.2"
   },
   "suggest": {
-	"nesbot/carbon": "When more advanded Date:: functions is needed",
-	"symfony/filesystem": "Needed for File::move, File::rename file oprations (ver >= 6.0)"
+    "nesbot/carbon": "When more advanded Date:: functions is needed"
   }
 }
