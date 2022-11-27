@@ -148,14 +148,14 @@ class File
      * @param  bool  $overwrite
      * @return bool
      */
-    public static function rename(string $file, string $target, bool $overwrite = false): bool
+    public static function rename(string $file, string $target, bool $overwrite = true): bool
     {
         if (Is::url($file) || Is::url($target)) {
             throw new IOException("Cant use to rename from/to URL");
         }
         $target = self::getTarget($file, $target);
-        if ($overwrite && file_exists($target)) {
-            throw new IOException("cannot rename existing file('$target')");
+        if (!$overwrite && file_exists($target)) {
+            throw new IOException("cannot overwrite existing file('$target')");
         }
 
         return rename($file, $target);
@@ -184,14 +184,14 @@ class File
      * @param  bool  $overwrite
      * @return bool
      */
-    public static function copy(string $file, string $target, bool $overwrite = false): bool
+    public static function copy(string $file, string $target, bool $overwrite = true): bool
     {
         if (Is::url($file) || Is::url($target)) {
             throw new IOException("Cant use to copy from/to URL");
         }
         $target = self::getTarget($file, $target);
-        if ($overwrite && file_exists($target)) {
-            throw new IOException("cannot copy existing file('$target')");
+        if (!$overwrite && file_exists($target)) {
+            throw new IOException("cannot overwrite existing file('$target')");
         }
 
         return copy($file, $target);
