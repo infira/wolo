@@ -1,6 +1,6 @@
 <?php
 
-namespace Wolo;
+namespace Wolo\AttributesBag;
 
 class AttributesBag implements \ArrayAccess
 {
