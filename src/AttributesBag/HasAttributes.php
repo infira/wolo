@@ -1,6 +1,6 @@
 <?php
 
-namespace Wolo\Contracts;
+namespace Wolo\AttributesBag;
 
 interface HasAttributes
 {
