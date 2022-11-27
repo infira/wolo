@@ -123,7 +123,7 @@ class Session extends InstanceShortcuts
     }
 
     /**
-     * @see https://stackoverflow.com/questions/3185779/the-session-id-is-too-long-or-contains-illegal-characters-valid-characters-are
+     * @link https://stackoverflow.com/questions/3185779/the-session-id-is-too-long-or-contains-illegal-characters-valid-characters-are
      * @return bool
      */
     private static function doStart(): bool

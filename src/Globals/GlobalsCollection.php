@@ -4,22 +4,17 @@ namespace Wolo\Globals;
 
 
 use JetBrains\PhpStorm\ArrayShape;
-use ReflectionException;
-use RuntimeException;
 use Wolo\Hash;
 
-final class GlobalsCollection
+class GlobalsCollection
 {
+    /**
+     * @var GlobalsCollection[]
+     */
     private array $collections = [];
-
     private array $data = [];
 
-    private string $name;
-
-    public function __construct(string $collectionName)
-    {
-        $this->name = $collectionName;
-    }
+    public function __construct(private string $name) {}
 
     /**
      * Generates new collection
@@ -48,64 +43,74 @@ final class GlobalsCollection
 
     /**
      * Checks if the item exists by key
-     *
-     * @param  string  $key
+     * @param  string|int  $key
      * @return bool
      */
-    public function exists(string $key): bool
+    public function has(string|int $key): bool
     {
         return array_key_exists($key, $this->data);
     }
 
     /**
-     * @see GlobalsCollection::exists()
-     */
-    public function has(string $key): bool
-    {
-        return $this->exists($key);
-    }
-
-    /**
      * Set new item
      *
-     * @param  string  $key
+     * @param  string|int  $key
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
-    public function set(string $key, mixed $value): void
+    public function put(string|int $key, mixed $value): static
     {
         $this->data[$key] = $value;
+
+        return $this;
     }
 
     /**
      * Add new item
      *
      * @param  mixed  $value
-     * @return void
+     * @return $this
      */
-    public function add(mixed $value): void
+    public function add(mixed $value): static
     {
         $this->data[] = $value;
+
+        return $this;
     }
 
     /**
      * @see GlobalsCollection::add()
      */
-    public function append(mixed $value): void
+    public function append(mixed $value): static
     {
-        $this->data[] = $value;
+        return $this->add($value);
+    }
+
+    /**
+     * Push one or more items onto the end of the collection.
+     *
+     * @param  mixed  ...$values
+     * @return $this
+     */
+    public function push(mixed...$values): static
+    {
+        foreach ($values as $value) {
+            $this->data[] = $value;
+        }
+
+        return $this;
     }
 
     /**
      * Get item, if not found $returnOnNotFound will be returned
      *
-     * @param  string  $key
+     * @param  string|int  $key
      * @param  mixed  $default  - if not found then that is returned
      * @return mixed/bool
      */
-    public function get(string $key, mixed $default = null): mixed
+    public function get(string|int $key, mixed $default = null): mixed
     {
-        if (!$this->exists($key)) {
+        if (!$this->has($key)) {
             return $default;
         }
 
@@ -113,18 +118,20 @@ final class GlobalsCollection
     }
 
     /**
-     * delete bye key
+     * Remove an item from the collection by key.
      *
-     * @param  string  $key
-     * @return bool
+     * @param  string|int|string[]|int[]  $keys
+     * @return $this
      */
-    public function delete(string $key): bool
+    public function forget(string|int|array $keys): static
     {
-        if ($this->exists($key)) {
-            unset($this->data[$key]);
+        foreach ((array)$keys as $key) {
+            if ($this->has($key)) {
+                unset($this->data[$key]);
+            }
         }
 
-        return true;
+        return $this;
     }
 
     /**
@@ -212,7 +219,7 @@ final class GlobalsCollection
     /**
      * get this all collections
      *
-     * @return array
+     * @return GlobalsCollection[]
      */
     public function collections(): array
     {
@@ -226,26 +233,25 @@ final class GlobalsCollection
      * If $keys contains only callback then hash sum will be generated Closure signature
      * @param  callable  $callback  method result will be set to memory for later use
      * @return mixed - $callback result
-     * @throws ReflectionException
      * @noinspection PhpDocSignatureInspection
      * @see Hash::hashable()
      */
     public function once(...$keys): mixed
     {
         if (!$keys) {
-            throw new RuntimeException('parameters not defined');
+            throw new \RuntimeException('parameters not defined');
         }
         $callback = $keys[array_key_last($keys)];
         if (!is_callable($callback)) {
-            throw new RuntimeException('last parameter must be callable');
+            throw new \RuntimeException('last parameter must be callable');
         }
         //if at least one key is provided then use only keys to make hashable
         if (count($keys) > 1) {
             $keys = array_slice($keys, 0, -1);
         }
         $cid = Hash::crc32b(...$keys);
-        if (!$this->exists($cid)) {
-            $this->set($cid, $callback());
+        if (!$this->has($cid)) {
+            $this->put($cid, $callback());
         }
 
         return $this->get($cid);
@@ -263,4 +269,34 @@ final class GlobalsCollection
 
         return true;
     }
+
+    //region deprecated
+
+    /**
+     * @see static::has()
+     * @deprecated
+     */
+    public function exists(string $key): bool
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * @see static::put()
+     * @deprecated
+     */
+    public function set(string|int $key, mixed $value): static
+    {
+        return $this->put($key, $value);
+    }
+
+    /**
+     * @see static::forget()
+     * @deprecated
+     */
+    public function delete(string|int|array $keys): static
+    {
+        return $this->forget($keys);
+    }
+    //endregion
 }

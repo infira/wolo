@@ -2,9 +2,6 @@
 
 namespace Wolo\Reflection;
 
-use ReflectionClass;
-use ReflectionException;
-
 class Reflection
 {
     /**
@@ -13,17 +10,16 @@ class Reflection
      * @param  string|object  $objectOrClass
      * @param  int  $depth  - check also parents traits, 0 all teh way to to last parent
      * @return array
-     * @throws ReflectionException
      */
     public static function getClassTraits(string|object $objectOrClass, int $depth = 0): array
     {
-        $class = new ReflectionClass($objectOrClass);
+        $class = new \ReflectionClass($objectOrClass);
         $traits = $class->getTraits();
         if ($depth !== null) {
             $currentDepth = 0;
             $depth = $depth === 0 ? 99 : $depth;
             while ($parent = $class->getParentClass() and $currentDepth <= $depth) {
-                $traits = array_merge($traits, $parent->getTraits());
+                array_push($traits, ...$parent->getTraits());
                 $class = $parent;
                 $currentDepth++;
             }
@@ -39,7 +35,6 @@ class Reflection
      * @param  string|object  $findObjectOrClass
      * @param  bool  $checkParents
      * @return bool
-     * @throws ReflectionException
      */
     public static function classHasTrait(string|object $objectOrClass, string|object $findObjectOrClass, bool $checkParents = true): bool
     {

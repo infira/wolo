@@ -2,38 +2,19 @@
 
 namespace Wolo;
 
-use Illuminate\Support\Stringable;
+use Stringable;
 
 class Is
 {
-    public static function email(string $email): bool
+    /**
+     * Is a valid email address
+     * https://www.php.net/manual/en/function.filter-var.php
+     * @param  string  $address
+     * @return bool
+     */
+    public static function email(string $address): bool
     {
-        // First, we check that there's one @ symbol, and that the lengths are right
-        if (!preg_match("/^[^@]{1,64}@[^@]{1,255}$/", $email)) {
-            // Email invalid because wrong number of characters in one section, or wrong number of @ symbols.
-            return false;
-        }
-        // Split it into sections to make life easier
-        $email_array = explode("@", $email);
-        $local_array = explode(".", $email_array[0]);
-        foreach ($local_array as $i => $iValue) {
-            if (!preg_match("/^(([A-Za-z0-9!#$%&'*+\/=?^_`{|}~-][A-Za-z0-9!#$%&'*+\/=?^_`{|}~\.-]{0,63})|(\"[^(\\|\")]{0,62}\"))$/", $local_array[$i])) {
-                return false;
-            }
-        }
-        if (!preg_match("/^\[?[0-9\.]+\]?$/", $email_array[1])) { // Check if domain is IP. If not, it should be valid domain name
-            $domain_array = explode(".", $email_array[1]);
-            if (count($domain_array) < 2) {
-                return false; // Not enough parts to domain
-            }
-            for ($i = 0; $i < sizeof($domain_array); $i++) {
-                if (!preg_match("/^(([A-Za-z0-9][A-Za-z0-9-]{0,61}[A-Za-z0-9])|([A-Za-z0-9]+))$/", $domain_array[$i])) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return (bool)filter_var($address, FILTER_VALIDATE_EMAIL);
     }
 
     /**
@@ -49,17 +30,58 @@ class Is
         return ($nr >= $from and $nr <= $to);
     }
 
-    /** can string be converted to string using (string)*/
+    /**
+     * can string be converted to string using (string)$value
+     * @param  mixed  $value
+     * @return bool
+     */
     public static function stringable(mixed $value): bool
     {
-        return is_string($value)
-            || is_int($value)
-            || is_float($value)
-            || $value instanceof Stringable;
+        return is_scalar($value)
+            || is_null($value)
+            || (is_object($value) && method_exists($value, '__toString'));
     }
 
     public static function match(string $pattern, $subject): bool
     {
         return (bool)Regex::match($pattern, $subject);
+    }
+
+    /**
+     * Has conditional value
+     * When value is string and "1", "true", "on", and "yes" then returns true
+     * Otherwise it validates using empty()
+     * @link https://www.php.net/manual/en/function.filter-var.php
+     * @example ok('true'); //true
+     * @example ok('false'); //false
+     * @example ok(true); //true
+     * @example ok(false); //false
+     * @example ok(1); //true
+     * @example ok(0); //false
+     * @example ok('1'); //true
+     * @example ok('0'); //false
+     * @example ok('hello world'); //true
+     * @example ok(''); //false
+     */
+    public static function ok(mixed $value): bool
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+            if ($value === '') {
+                return false;
+            }
+            $is = filter_var(trim($value), FILTER_VALIDATE_BOOLEAN, ['flags' => FILTER_NULL_ON_FAILURE]);
+            if (is_bool($is)) {
+                return $is;
+            }
+        }
+
+        return !empty($value);
+    }
+
+    /** @see static::ok() */
+    public static function notOk(mixed $value): bool
+    {
+        return $value;
     }
 }

@@ -39,23 +39,4 @@ class Regex
 
         return $matches[1] ?? $matches[0];
     }
-
-    /**
-     * Check whatever $pattern is valid regular expression pattern
-     *
-     * @param  string  $pattern
-     * @param  array  $checkWithDelimiters
-     * @return bool
-     */
-    public static function isPattern(string $pattern, array $checkWithDelimiters = ['/', '#', '~']): bool
-    {
-        //see https://www.php.net/manual/en/regexp.reference.delimiters.php
-        foreach ($checkWithDelimiters as $delim) {
-            if (preg_match('/^\\'.$delim.'[\s\S]+\\'.$delim.'[A-Za-z]?$/', $pattern)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 }

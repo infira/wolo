@@ -88,7 +88,7 @@ class Http extends InstanceShortcuts
     /**
      * $_SERVER values
      *
-     * @see https://www.php.net/manual/en/reserved.variables.server.php
+     * @link https://www.php.net/manual/en/reserved.variables.server.php
      *
      * @return ServerCollection
      */
@@ -223,6 +223,16 @@ class Http extends InstanceShortcuts
         }
 
         return $url.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * Get current url path without query parameters
+     * @return string
+     *
+     */
+    public static function currentUrlQueryPath(): string
+    {
+        return explode('?', static::currentUrl())[0] ?? '';
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Wolo\Request;
 
-use RuntimeException;
 use Wolo\Request\Support\InstanceShortcuts;
 use Wolo\Request\Support\RequestVariableCollection;
 
@@ -26,7 +25,7 @@ class Cookie extends InstanceShortcuts
      * @param  mixed  $value
      * @param  int|string  $expires  - when expires. (int)0 - forever,(string)"10 hours" -  will be converted to time using strtotime(), (int)1596885301 - timestamp. If $expires is in the past, it will be converted as forever.
      * @param  bool  $secure  Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client. When set to TRUE, the cookie will only be set if a secure connection exists. On the server-side, it's on the programmer to send this kind of cookie only on secure connection (e.g. with respect to $_SERVER["HTTPS"]).
-     * @see https://www.php.net/manual/en/function.setcookie.php
+     * @link https://www.php.net/manual/en/function.setcookie.php
      */
     public static function set(string $key, mixed $value, int|string $expires = 0, bool $secure = true): void
     {

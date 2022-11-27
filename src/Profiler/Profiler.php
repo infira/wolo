@@ -2,10 +2,6 @@
 
 namespace Wolo\Profiler;
 
-use Exception;
-use RuntimeException;
-use Wolo\Request\Http;
-
 class Profiler
 {
     private array $description;
@@ -17,6 +13,7 @@ class Profiler
     private string $trace;
     private array $count;
     private array $running;
+    private bool $halted = false;
 
     public function __construct()
     {
@@ -32,15 +29,37 @@ class Profiler
     }
 
     /**
-     * U can set to void void usage of profiler
+     * Halt current Profiler instance
      *
-     * @return void
+     * @return $this
      */
-    public function void(): void
+    public function halt(): static
     {
-        if (!defined("VOID_PROFILER")) {
-            define("VOID_PROFILER", true);
+        $this->halted = true;
+
+        return $this;
+    }
+
+    /**
+     * Continue current Profiler instance measuring
+     *
+     * @return $this
+     */
+    public function continue(): static
+    {
+        $this->halted = false;
+
+        return $this;
+    }
+
+    /** Is measuring halted */
+    public function isHalted(): bool
+    {
+        if (Prof::isHalted()) {
+            return true;
         }
+
+        return $this->halted;
     }
 
     /**
@@ -53,19 +72,20 @@ class Profiler
      */
     public function start(string $name, string $desc = ""): void
     {
-        if (!$this->isVoided()) {
-            $this->trace .= "start   $name\n";
-            $n = array_push($this->stack, $this->cur_timer);
-            $this->suspendTimer($this->stack[$n - 1]);
-            $this->startTime[$name] = microtime(true);
-            $this->cur_timer = $name;
-            $this->description[$name] = $desc;
-            if (!array_key_exists($name, $this->count)) {
-                $this->count[$name] = 1;
-            }
-            else {
-                $this->count[$name]++;
-            }
+        if ($this->isHalted()) {
+            return;
+        }
+        $this->trace .= "start   $name\n";
+        $n = array_push($this->stack, $this->cur_timer);
+        $this->suspendTimer($this->stack[$n - 1]);
+        $this->startTime[$name] = microtime(true);
+        $this->cur_timer = $name;
+        $this->description[$name] = $desc;
+        if (!array_key_exists($name, $this->count)) {
+            $this->count[$name] = 1;
+        }
+        else {
+            $this->count[$name]++;
         }
     }
 
@@ -78,29 +98,43 @@ class Profiler
      */
     public function stop(string $name): void
     {
-        if (!$this->isVoided()) {
-            $this->trace .= "stop    $name\n";
-            $this->endTime[$name] = microtime(true);
-            if (!array_key_exists($name, $this->running)) {
-                $this->running[$name] = $this->elapsedTime($name);
-            }
-            else {
-                $this->running[$name] += $this->elapsedTime($name);
-            }
-            $this->cur_timer = array_pop($this->stack);
-            $this->resumeTimer($this->cur_timer);
+        if ($this->isHalted()) {
+            return;
         }
-    }
-
-    public function measure(string $name, callable $measurable, mixed ...$measurableArguments): void
-    {
-        $this->start($name);
-        $measurable(...$measurableArguments);
-        $this->start($name);
+        $this->trace .= "stop    $name\n";
+        $this->endTime[$name] = microtime(true);
+        if (!array_key_exists($name, $this->running)) {
+            $this->running[$name] = $this->elapsedTime($name);
+        }
+        else {
+            $this->running[$name] += $this->elapsedTime($name);
+        }
+        $this->cur_timer = array_pop($this->stack);
+        $this->resumeTimer($this->cur_timer);
     }
 
     /**
-     * measure the elapsed time of a timer without stoping the timer if
+     * Measure callable and return callable result
+     * When Is halted then just runs action
+     * @param  string  $name
+     * @param  callable  $action
+     * @param  mixed  ...$actionArguments
+     * @return mixed
+     */
+    public function measure(string $name, callable $action, mixed ...$actionArguments): mixed
+    {
+        if ($this->isHalted()) {
+            return $action(...$actionArguments);
+        }
+        $this->start($name);
+        $output = $action(...$actionArguments);
+        $this->stop($name);
+
+        return $output;
+    }
+
+    /**
+     * measure the elapsed time of a timer without stopping the timer if
      *
      * @param  string  $name
      * @return float
@@ -120,13 +154,10 @@ class Profiler
         return ($now - $this->startTime[$name]);
     }
 
-    /**
-     * @throws Exception
-     */
     public function dump(): string
     {
-        $allTotal = 0;
-        $tot_perc = 0;
+        $totalTime = 0;
+        $totalPercent = 0;
         ksort($this->description);
         $return = '<pre class="profiler">';
         $oaTime = microtime(true) - $this->initTime;
@@ -142,16 +173,16 @@ class Profiler
         foreach ($this->description as $key => $val) {
             $nr++;
             $total = $this->running[$key];
-            $allTotal += $total;
+            $totalTime += $total;
             $count = $this->count[$key];
-            $perc = ($total / $oaTime) * 100;
-            $tot_perc += $perc;
+            $percent = ($total / $oaTime) * 100;
+            $totalPercent += $percent;
             if (strpos($key, 'function')) {
                 $key = '<strong style="color:#CC0000">'.$key.'</strong>';
             }
-            $list[] = ['nr' => $nr, 'calls' => sprintf("%3d", $count), 'time' => $total, 'percent' => sprintf("%3.2f", $perc), 'name' => $key];
+            $list[] = ['nr' => $nr, 'calls' => sprintf("%3d", $count), 'time' => $total, 'percent' => sprintf("%3.2f", $percent), 'name' => $key];
         }
-        $this->orderByField($list, 'percent', true);
+        $this->orderByPercentage($list);
         $return .= '<style>
 			table.profileTable th,table.profileTable td{padding:2px;background-color:#FFFFFF}
 			</style>';
@@ -160,7 +191,7 @@ class Profiler
         $return .= '<th> Nr </th>';
         $return .= '<th> calls </th>';
         $return .= '<th> time </th>';
-        $return .= '<th> perscent </th>';
+        $return .= '<th> percent </th>';
         $return .= '<th> name </th>';
         $return .= '</tr>';
         $nr = 1;
@@ -178,15 +209,14 @@ class Profiler
 
         $return .= "\n";
 
-        $missed = $oaTime - $allTotal;
-        $perc = ($missed / $oaTime) * 100;
-        $tot_perc += $perc;
-        // $perc=sprintf("%3.2f", $perc );
-        $return .= sprintf("       %3.4fs (%3.2f%%)  %s\n", $missed, $perc, "Missed");
+        $missed = $oaTime - $totalTime;
+        $percent = ($missed / $oaTime) * 100;
+        $totalPercent += $percent;
+        $return .= sprintf("       %3.4fs (%3.2f%%)  %s\n", $missed, $percent, "Missed");
 
         $return .= "============================================================================\n";
 
-        $return .= sprintf("       %3.4fs (%3.2f%%)  %s\n", $oaTime, $tot_perc, "OVERALL TIME");
+        $return .= sprintf("       %3.4fs (%3.2f%%)  %s\n", $oaTime, $totalPercent, "OVERALL TIME");
 
         $return .= "============================================================================\n";
         $return .= "</pre>";
@@ -194,66 +224,22 @@ class Profiler
         return $return;
     }
 
-    /**
-     * @throws Exception
-     */
     public function print(): void
     {
         echo $this->dump();
     }
 
-    /**
-     * @return bool
-     */
-    private function isVoided(): bool
+    private function orderByPercentage(array &$data): void
     {
-        if (Http::isAjax()) {
-            return true;
-        }
-        if (defined("VOID_PROFILER") && VOID_PROFILER === true) {
-            return true;
-        }
+        $orderByKey = 'percent';
 
-        return false;
-    }
-
-    /**
-     * Sort array by fields
-     *
-     * @param  array  $data
-     * @param  string  $field
-     * @param  bool  $descending
-     * @throws Exception
-     */
-    private function orderByField(array &$data, string $field, bool $descending = false): void
-    {
-        $sortArr = [];
-
-        foreach ($data as $key => $value) {
-            if (!isset($value[$field])) {
-                throw new RuntimeException($field.' is missing in the sortable array');
-            }
-            $va = $value[$field];
-            if ($field === "percent") {
-                $va = (float)$va;
-            }
-            if ($field === "time") {
-                $va = (int)$va;
-            }
-            $sortArr[$key] = $va;
+        $sortArr = array_map(static fn($row) => (float)$row[$orderByKey], $data);
+        arsort($sortArr);
+        $result = [];
+        foreach (array_keys($sortArr) as $k) {
+            $result[] = $data[$k];
         }
-        if ($descending) {
-            arsort($sortArr);
-        }
-        else {
-            asort($sortArr);
-        }
-
-        $resultArr = [];
-        foreach ($sortArr as $key => $value) {
-            $resultArr[$key] = $data[$key];
-        }
-        $data = $resultArr;
+        $data = $result;
     }
 
     /**

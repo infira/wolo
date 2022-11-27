@@ -2,34 +2,32 @@
 
 namespace Wolo\Traits;
 
-use Closure;
-use Exception;
-use ReflectionException;
-use ReflectionFunction;
-use Serializable;
-use stdClass;
-use Stringable;
-use Wolo\Regex;
+use Wolo\Hash;
+use Wolo\Is;
+use Wolo\VarDumper;
 
 trait StringTrait
 {
     /**
      * Simple string templating
      *
-     * @param  string  $string
+     * @param  mixed  $template
      * @param  array  $vars
-     * @param  string  $syntax
+     * @param  string|array  $syntax
      * @return string
+     * @example render('my name is {name}',['name' => 'gen']) // 'my name is gen'
      */
-    public static function vars(string $string, array $vars, string $syntax = '{}'): string
+    public static function vars(mixed $template, array $vars, string|array $syntax = '{}'): string
     {
-        $start = $syntax[0];
-        $end = $syntax[1] ?? $syntax[0];
+        $map = [];
         foreach ($vars as $name => $value) {
-            $string = str_replace([$start.$name.$end], $value, $string);
+            foreach ((array)$syntax as $singleSyntax) {
+                [$start, $end] = mb_str_split($singleSyntax, 1);
+                $map[$start.$name.$end] = $value;
+            }
         }
 
-        return $string;
+        return strtr($template, $map);
     }
 
     public static function endsWith(string $string, string $width): bool
@@ -46,29 +44,26 @@ trait StringTrait
      * Determine if a given string matches a given pattern.
      * Used Laravel Str::is for based, added little more functionality, it detects if pattern is already regular expression
      *
-     * @param  string|array  $patterns
+     * @param  string|iterable<string>  $pattern
      * @param  string  $value
      * @return bool
      * @author https://github.com/illuminate/support/blob/master/Str.php
      */
-    public static function is(string|array $patterns, string $value): bool
+    public static function is(string|iterable $pattern, $value): bool
     {
-        if (empty($patterns)) {
-            return false;
-        }
-        $patterns = (array)$patterns;
+        $value = (string)$value;
 
-        foreach ($patterns as $pattern) {
+        if (!is_iterable($pattern)) {
+            $pattern = [$pattern];
+        }
+
+        foreach ($pattern as $pattern) {
             $pattern = (string)$pattern;
 
             // If the given value is an exact match we can of course return true right
             // from the beginning. Otherwise, we will translate asterisks and do an
             // actual pattern match against the two strings to see if they match.
             if ($pattern === $value) {
-                return true;
-            }
-
-            if (Regex::isPattern($pattern) && preg_match($pattern, $value) === 1) {
                 return true;
             }
 
@@ -88,29 +83,26 @@ trait StringTrait
     }
 
     /**
-     * generate document no from ID
-     * e.g. ID of docNo(1234,6) becomes 001234
-     *
-     * @param  int  $documentID
-     * @param  int  $length
-     * @return string
+     * @see static::basename()
+     * @deprecated
      */
-    public static function docNo(int $documentID, int $length = 6): string
+    public static function classBasename(string|object $class): string
     {
-        return str_repeat("0", ($length - strlen($documentID))).$documentID;
+        return static::basename($class);
     }
 
     /**
      * Turns \My\CoolNamespace\MyClass into myClass
+     * works as well with /my/path
      *
-     * @param  string|object  $class
+     * @param  string|object  $value
      * @return string
      */
-    public static function classBasename(string|object $class): string
+    public static function basename(string|object $value): string
     {
-        $class = is_object($class) ? get_class($class) : $class;
+        $value = is_object($value) ? get_class($value) : $value;
 
-        return basename(str_replace('\\', '/', $class));
+        return basename(str_replace('\\', '/', $value));
     }
 
     /**
@@ -150,7 +142,6 @@ trait StringTrait
      *
      * @param  int  $length
      * @return string
-     * @throws Exception
      * @author https://github.com/illuminate/support/blob/master/Str.php
      */
     public static function random(int $length = 16): string
@@ -173,118 +164,83 @@ trait StringTrait
      *
      * @param  mixed  $var
      * @return string
+     * @see VarDumper::varDump
+     * @deprecated
      */
     public static function dump(mixed $var): string
     {
-        ob_start();
-        var_dump($var);
-
-        return ob_get_clean();
+        return VarDumper::varDump($var);
     }
 
     /**
      * can string be converted to string using (string)$var
      * @param  mixed  $var
      * @return bool
+     * @see Is::stringable()
+     * @deprecated
      */
     public static function isStringable(mixed $var): bool
     {
-        return is_string($var)
-            || is_int($var)
-            || is_float($var)
-            || $var instanceof Stringable;
+        return Is::stringable($var);
     }
 
     /**
      * Generate any variable to hashable string
      * Use cases use this to md5(Str::hashable(value), or hash('algo',Str::hashable(value))
      *
-     * @param  mixed  ...$hashable
+     * @param  mixed  ...$data
      * @return string
-     * @throws ReflectionException
-     * @throws Exception
+     * @see Hash::hashable()
+     * @deprecated
      */
-    public static function hashable(...$hashable): string
+    public static function hashable(...$data): string
     {
-        $output = [];
-        foreach ($hashable as $value) {
-            if ($value instanceof Closure) {
-                $ref = new ReflectionFunction($value);
-                $value = $ref->__toString();
-                $value = preg_replace('/@@.+/', '', $value);//remove file location
-                $value = self::hashable($value, $ref->getStaticVariables());
-            }
-
-            elseif ($value instanceof Serializable) {
-                $value = $value->serialize();
-            }
-            elseif (is_array($value) || $value instanceof stdClass) {
-                $valueDump = [];
-                foreach ((array)$value as $k => $v) {
-                    $valueDump[self::hashable($k)] = self::hashable($v);
-                }
-                $value = serialize($valueDump);
-            }
-            elseif (static::isStringable($value)) {
-                $value = (string)$value;
-            }
-            else {
-                $value = static::dump($value);
-            }
-            $output[] = preg_replace('![\s]+!u', '', $value);
-        }
-
-        return implode('-', $output);
+        return Hash::hashable(...$data);
     }
 
     /**
-     * make hash using md5 algorithm
-     * @param ...$hashable
-     * @return string
-     * @throws ReflectionException
-     * @see https://www.php.net/manual/en/function.hash.php
+     * @see Hash::md5()
+     * @deprecated
      */
-    public static function md5(...$hashable): string { return static::hash('md5', ...$hashable); }
-
-    /**
-     * make hash using sha1 algorithm
-     * @param ...$hashable
-     * @return string
-     * @throws ReflectionException
-     * @see https://www.php.net/manual/en/function.hash.php
-     */
-    public static function sha1(...$hashable): string { return static::hash('md5', ...$hashable); }
-
-    /**
-     * make hash using crc32b algorithm
-     * @param ...$hashable
-     * @return string
-     * @throws ReflectionException
-     * @see https://www.php.net/manual/en/function.hash.php
-     */
-    public static function crc32b(...$hashable): string { return static::hash('md5', ...$hashable); }
-
-    /**
-     * make hash using sha512 algorithm
-     * @param ...$hashable
-     * @return string
-     * @throws ReflectionException
-     * @see https://www.php.net/manual/en/function.hash.php
-     */
-    public static function sha512(...$hashable): string { return static::hash('md5', ...$hashable); }
-
-    /**
-     * make hash from any typeof value using $algorithm
-     * @param  string  $algo
-     * @param ...$hashable
-     * @return string
-     * @throws ReflectionException
-     * @see https://www.php.net/manual/en/function.hash-algos.php
-     * @see https://www.php.net/manual/en/function.hash.php
-     */
-    public static function hash(string $algo = 'md5', ...$hashable): string
+    public static function md5(...$data): string
     {
-        return hash($algo, static::hashable(...$hashable));
+        return Hash::md5(...$data);
+    }
+
+    /**
+     * @see Hash::sha1()
+     * @deprecated
+     */
+    public static function sha1(...$data): string
+    {
+        return Hash::sha1(...$data);
+    }
+
+    /**
+     * @see Hash::crc32b()
+     * @deprecated
+     */
+    public static function crc32b(...$data): string
+    {
+        return Hash::crc32b(...$data);
+    }
+
+    /**
+     * @see Hash::sha512()
+     * @deprecated
+     */
+    public static function sha512(...$data): string
+    {
+        return Hash::sha512(...$data);
+    }
+
+    /**
+     * @see Hash::make()
+     * @deprecated
+     */
+    public static function hash(string $algo = 'md5', ...$data): string
+    {
+        return Hash::make($algo, ...$data);
     }
 
     public static function lower(string $value): string

@@ -2,6 +2,7 @@
 
 namespace Wolo;
 
+use Wolo\Traits\NumberTrait;
 use Wolo\Traits\StringTrait;
 
 class Str
@@ -20,4 +21,5 @@ class Str
      * also, traits are easily overridable
      */
     use StringTrait;
+    use NumberTrait;
 }
