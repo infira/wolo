@@ -47,7 +47,7 @@ class Prof
      * @param  string  $name
      * @return Profiler
      */
-    public static function of(string $name): Profiler
+    public static function of(string $name = 'globalProfiler'): Profiler
     {
         return ClassFarm::barn("WoloProfiler.$name", Profiler::class);
     }
