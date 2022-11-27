@@ -4,6 +4,8 @@ namespace Wolo\AttributesBag;
 
 trait AttributesBagManager
 {
+    protected AttributesBag $attributes;
+
     private function attributes(): AttributesBag
     {
         if (!isset($this->attributes)) {
