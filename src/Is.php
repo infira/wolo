@@ -84,4 +84,20 @@ class Is
     {
         return $value;
     }
+
+
+    /**
+     * Checks if variable is valid url
+     * @param  mixed  $value
+     * @return bool
+     * @link https://www.php.net/manual/en/function.filter-var.php
+     */
+    public static function url(mixed $value): bool
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return (bool)filter_var($value, FILTER_VALIDATE_URL);
+    }
 }

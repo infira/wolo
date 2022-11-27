@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Wolo\File;
 
-use Exception;
-use RuntimeException;
+use Wolo\File\Exception\FolderNotFoundException;
+use Wolo\File\Exception\IOException;
 use Wolo\Str;
 
 class Folder
@@ -13,241 +11,213 @@ class Folder
     /**
      * Delete a folder including all its content
      *
-     * @param  string  $path
-     * @throws Exception
+     * @param  string  $directory
      */
-    public static function delete(string $path): void
+    public static function delete(string $directory): void
     {
-        self::doFlush($path, true);
+        self::doFlush($directory, true);
     }
 
     /**
      * Flush folder content
      *
-     * @param  string  $path
-     * @throws Exception
+     * @param  string  $directory
      */
-    public static function flush(string $path): void
+    public static function flush(string $directory): void
     {
-        self::doFlush($path, false);
+        self::doFlush($directory, false);
     }
 
     /**
      * If folder doest no exists make it
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  int  $chmod  - chmod it
      * @return string created dir path
-     * @throws Exception
      */
-    public static function make(string $path, int $chmod = 0777): string
+    public static function make(string $directory, int $chmod = 0777): string
     {
-        if (!$path) {
-            throw new RuntimeException('path cannot be empty');
+        if (empty($directory)) {
+            throw new IOException("directory('$directory') cannot be empty");
         }
-        if (is_file($path)) {
-            throw new RuntimeException('path cannot be file');
+        if (is_dir($directory)) {
+            return $directory;
         }
-        if (is_dir($path)) {
-            return $path;
-        }
-        if (!mkdir($path, $chmod, true) && !is_dir($path)) {
-            throw new RuntimeException(sprintf('Directory "%s" was not created', $path));
+        if (!mkdir($directory, $chmod, true) && !is_dir($directory)) {
+            throw new IOException(sprintf('Directory "%s" was not created', $directory));
         }
 
-        return $path;
+        return $directory;
     }
 
     /**
      * Find only files inside folder
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function files(string $path, ...$filterPatterns): array
+    public static function files(string $directory, ...$filterPatterns): array
     {
-        return self::scanner($path, false, false, true, true, [], $filterPatterns);
+        return self::scanner($directory, false, false, true, true, [], $filterPatterns);
     }
 
     /**
      * Find only files inside folder recursively
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression OR simple string pattern with asterisks as wildcard, OR use ^ to mark start of the string OR $ to end of the string
      * @return array
-     * @throws Exception
      */
-    public static function filesRecursive(string $path, ...$filterPatterns): array
+    public static function filesRecursive(string $directory, ...$filterPatterns): array
     {
-        return self::scanner($path, true, false, true, true, [], $filterPatterns);
+        return self::scanner($directory, true, false, true, true, [], $filterPatterns);
     }
 
     /**
      * Find only folders inside folder
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function folders(string $path, ...$filterPatterns): array
+    public static function folders(string $directory, ...$filterPatterns): array
     {
-        return self::scanner($path, false, true, false, true, [], $filterPatterns);
+        return self::scanner($directory, false, true, false, true, [], $filterPatterns);
     }
 
     /**
      * Find only folders inside folder recursively
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function foldersRecursive(string $path, ...$filterPatterns): array
+    public static function foldersRecursive(string $directory, ...$filterPatterns): array
     {
-        return self::scanner($path, true, true, false, true, [], $filterPatterns);
+        return self::scanner($directory, true, true, false, true, [], $filterPatterns);
     }
 
     /**
      * Get filenames side folder
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function fileNames(string $path, string ...$filterPatterns): array
+    public static function fileNames(string $directory, string ...$filterPatterns): array
     {
-        return self::scanner($path, false, false, true, false, [], $filterPatterns);
+        return self::scanner($directory, false, false, true, false, [], $filterPatterns);
     }
 
     /**
      * Get files and sub folders inside path
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array - array with absolute paths
-     * @throws Exception
      */
-    public static function content(string $path, string ...$filterPatterns): array
+    public static function content(string $directory, string ...$filterPatterns): array
     {
-        return self::scanner($path, false, true, true, true, [], $filterPatterns);
+        return self::scanner($directory, false, true, true, true, [], $filterPatterns);
     }
 
     /**
      * Get files and sub folders inside path recursively
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$filterPatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array - array with absolute paths
-     * @throws Exception
      */
-    public static function contentRecursive(string $path, string ...$filterPatterns): array
+    public static function contentRecursive(string $directory, string ...$filterPatterns): array
     {
-        return self::scanner($path, true, true, true, true, [], $filterPatterns);
+        return self::scanner($directory, true, true, true, true, [], $filterPatterns);
     }
 
     /**
      * Find only files inside folder excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function filesExcept(string $path, ...$excludePatterns): array
+    public static function filesExcept(string $directory, ...$excludePatterns): array
     {
-        return self::scanner($path, false, false, true, true, $excludePatterns);
+        return self::scanner($directory, false, false, true, true, $excludePatterns);
     }
 
     /**
      * Find only files inside folder recursively excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function filesRecursiveExcept(string $path, ...$excludePatterns): array
+    public static function filesRecursiveExcept(string $directory, ...$excludePatterns): array
     {
-        return self::scanner($path, true, false, true, true, $excludePatterns);
+        return self::scanner($directory, true, false, true, true, $excludePatterns);
     }
 
     /**
      * Find only folders inside folder excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function foldersExcept(string $path, ...$excludePatterns): array
+    public static function foldersExcept(string $directory, ...$excludePatterns): array
     {
-        return self::scanner($path, false, true, false, true, $excludePatterns);
+        return self::scanner($directory, false, true, false, true, $excludePatterns);
     }
 
     /**
      * Find only folders inside folder recursively excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  string  ...$excludePatterns  a regular expression or simple string pattern with asterisks as wildcard
      * @return array
-     * @throws Exception
      */
-    public static function foldersRecursiveExcept(string $path, ...$excludePatterns): array
+    public static function foldersRecursiveExcept(string $directory, ...$excludePatterns): array
     {
-        return self::scanner($path, true, true, false, true, $excludePatterns);
+        return self::scanner($directory, true, true, false, true, $excludePatterns);
     }
 
     /**
      * Get files and sub folders inside path excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  array  $excludePatterns
      * @return array - array with absolute paths
-     * @throws Exception
      */
-    public static function contentExcept(string $path, array $excludePatterns = []): array
+    public static function contentExcept(string $directory, array $excludePatterns = []): array
     {
-        return self::scanner($path, false, true, true, true, $excludePatterns);
+        return self::scanner($directory, false, true, true, true, $excludePatterns);
     }
 
     /**
      * Get files and sub folders inside path recursively excluding patterns
      *
-     * @param  string  $path
+     * @param  string  $directory
      * @param  array  $filterPatterns
      * @return array - array with absolute paths
-     * @throws Exception
      */
-    public static function contentRecursiveExcept(string $path, array $filterPatterns = []): array
+    public static function contentRecursiveExcept(string $directory, array $filterPatterns = []): array
     {
-        return self::scanner($path, true, true, true, true, [], $filterPatterns);
+        return self::scanner($directory, true, true, true, true, [], $filterPatterns);
     }
 
-    /**
-     * @throws Exception
-     */
-    public static function scanner(string $path, bool $recursive, bool $includeFolders, bool $includeFiles, bool $getAbsolutePaths, array $excludePatterns = [], array $filterPatterns = []): array
+    public static function scanner(string $directory, bool $recursive, bool $includeFolders, bool $includeFiles, bool $getAbsolutePaths, array $excludePatterns = [], array $filterPatterns = []): array
     {
         $output = [];
-        $realpath = realpath($path);
-        if ($realpath === false) {
-            throw new RuntimeException("cant resolve realpath of ('$path')");
-        }
-        if (!is_dir($realpath)) {
-            throw new RuntimeException("$realpath folder does not exists");
-        }
-        foreach (scandir($realpath) as $file) {
+        self::validateDirectory($directory);
+        foreach (scandir($directory) as $file) {
             if ($file === '.' || $file === '..') {
                 continue;
             }
-            $file = realpath(Path::join($realpath, $file));
+            $file = Path::join($directory, $file);
 
             if ($recursive && is_dir($file)) {
-                $output = array_merge($output, self::scanner($file, $recursive, $includeFolders, $includeFiles, $getAbsolutePaths, $excludePatterns, $filterPatterns));
+                array_push($output, ...self::scanner($file, true, $includeFolders, $includeFiles, $getAbsolutePaths, $excludePatterns, $filterPatterns));
             }
 
             $outputFile = $getAbsolutePaths ? $file : basename($file);
@@ -265,6 +235,14 @@ class Folder
         }
 
         return $output;
+    }
+
+    //region helpers
+    private static function validateDirectory(string $directory): void
+    {
+        if (!is_dir($directory)) {
+            throw new FolderNotFoundException("directory('$directory') is not a directory or does not exists");
+        }
     }
 
     private static function isMatch(string|array $patterns, string $str): bool
@@ -286,24 +264,15 @@ class Folder
         return false;
     }
 
-    /**
-     * @throws Exception
-     */
-    private static function doFlush(string $path, bool $selfRemove): void
+    private static function doFlush(string $directory, bool $selfRemove): void
     {
-        $realpath = realpath($path);
-        if ($realpath === false) {
-            return;
-        }
-        if (is_file($realpath)) {
-            throw new RuntimeException("path ('$realpath') is a file");
-        }
+        self::validateDirectory($directory);
 
-        array_map('unlink', self::filesRecursive($realpath));
-        array_map('rmdir', self::foldersRecursive($realpath));
+        array_map('unlink', self::filesRecursive($directory));
+        array_map('rmdir', self::foldersRecursive($directory));
 
         if ($selfRemove) {
-            rmdir($realpath);
+            rmdir($directory);
         }
     }
 }
