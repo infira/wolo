@@ -32,7 +32,7 @@ class File
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getextension.php
      */
-    public static function extension(string $file, bool $lowercase = true): string
+    public static function extension(string $file, bool $lowercase = false): string
     {
         $extension = static::info($file)->getExtension();
 
