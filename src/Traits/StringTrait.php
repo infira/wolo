@@ -185,20 +185,6 @@ trait StringTrait
     }
 
     /**
-     * Generate any variable to hashable string
-     * Use cases use this to md5(Str::hashable(value), or hash('algo',Str::hashable(value))
-     *
-     * @param  mixed  ...$data
-     * @return string
-     * @see Hash::hashable()
-     * @deprecated
-     */
-    public static function hashable(...$data): string
-    {
-        return Hash::hashable(...$data);
-    }
-
-    /**
      * @see Hash::md5()
      * @deprecated
      */

@@ -20,7 +20,7 @@ use Wolo\ClassFarm\ClassFarm;
  * @method static void eachTree(callable $callback)
  * @method static void eachCollection(callable $callback)
  * @method static array collections()
- * @method static mixed once(mixed ...$keys, callable $callback) - Execute $callback once by hash-sum of $parameters
+ * @method static mixed once(mixed ...$keys) - Execute $callback once by hash-sum of $parameters
  * @method static bool flush()
  * @see GlobalsCollection
  */

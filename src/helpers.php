@@ -45,15 +45,11 @@ if (!function_exists('getTrace')) {
     function getTrace(int $startAt = 0): array
     {
         $backTrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-        $handler = Globals::get('wolo.getTraceDefaultHandler', static function ($item) {
-            if (!isset($item['file'])) {
-                return $item;
-            }
-
-            return $item['file'].':'.$item['line'];
+        $handler = Globals::get('wolo.getTraceDefaultHandler', static function ($file, $line) {
+            return $file.':'.$line;
         });
 
-        return array_map($handler, array_slice($backTrace, $startAt));
+        return array_map(static fn($item) => $handler($item['file'] ?? '', $item['line'] ?? 0), array_slice($backTrace, $startAt));
     }
 }
 
