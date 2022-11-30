@@ -14,7 +14,7 @@ class GlobalsCollection
     private array $collections = [];
     private array $data = [];
 
-    public function __construct(private string $name) {}
+    public function __construct(private string $name, private string $parentCollectionName = '') {}
 
     /**
      * Generates new collection
@@ -25,7 +25,7 @@ class GlobalsCollection
     public function of(string $name): GlobalsCollection
     {
         if (!isset($this->collections[$name])) {
-            $this->collections[$name] = new GlobalsCollection($name);
+            $this->collections[$name] = new GlobalsCollection($name, $this->name);
         }
 
         return $this->collections[$name];
@@ -249,6 +249,7 @@ class GlobalsCollection
         if (count($keys) > 1) {
             $keys = array_slice($keys, 0, -1);
         }
+        array_push($keys, $this->parentCollectionName, $this->name);
         $cid = Hash::crc32b(...$keys);
         if (!$this->has($cid)) {
             $this->put($cid, $callback());
