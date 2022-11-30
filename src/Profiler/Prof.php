@@ -6,7 +6,7 @@ namespace Wolo\Profiler;
 use Wolo\ClassFarm\ClassFarm;
 
 /**
- * @method static void measure(string $name, callable $measurable, mixed ...$measurableArguments)
+ * @method static mixed measure(string $name, callable $measurable, mixed ...$measurableArguments)
  * @method static void start(string $name)
  * @method static void stop(string $name)
  * @method static float elapsedTime()
