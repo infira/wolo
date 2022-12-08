@@ -11,11 +11,11 @@ trait StringTrait
     /**
      * Simple string templating
      *
-     * @param  mixed  $template
+     * @example render('my name is {name}',['name' => 'gen']) // 'my name is gen'
      * @param  array  $vars
      * @param  string|array  $syntax
+     * @param  mixed  $template
      * @return string
-     * @example render('my name is {name}',['name' => 'gen']) // 'my name is gen'
      */
     public static function vars(mixed $template, array $vars, string|array $syntax = '{}'): string
     {
@@ -174,6 +174,7 @@ trait StringTrait
 
     /**
      * can string be converted to string using (string)$var
+     *
      * @param  mixed  $var
      * @return bool
      * @see Is::stringable()
@@ -251,5 +252,33 @@ trait StringTrait
     public static function upper(string $value): string
     {
         return mb_strtoupper($value, 'UTF-8');
+    }
+
+    /**
+     * @example Flu::wrap('value','{','}') // "{value}"
+     * @example Flu::wrap('value',['{','}']) //"{value}"
+     * @example Flu::wrap('value',['{','['],['}',']']) // "[{value}]"
+     * @param  mixed  $value
+     * @param  string|array  $before
+     * @param  string|array|null  $after
+     * @return string
+     */
+    public static function wrap(mixed $value, string|array $before, string|array $after = null): string
+    {
+        if (is_array($before) && $after === null) {
+            [$before, $after] = $before;
+
+            return self::wrap($value, $before, $after);
+        }
+        if (is_array($before) && is_array($after)) {
+            $carry = $value;
+            foreach (array_combine($before, $after) as $left => $right) {
+                $carry = self::wrap($carry, $left, $right);
+            }
+
+            return $carry;
+        }
+
+        return $before.$value.($after ??= $before);
     }
 }
