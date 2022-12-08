@@ -43,6 +43,7 @@ class GlobalsCollection
 
     /**
      * Checks if the item exists by key
+     *
      * @param  string|int  $key
      * @return bool
      */
@@ -86,6 +87,18 @@ class GlobalsCollection
         return $this->add($value);
     }
 
+    public function prepend(mixed $value, string|int $key = null): static
+    {
+        if (func_num_args() == 1) {
+            array_unshift($this->data, $value);
+        }
+        else {
+            $this->data = [$key => $value] + $this->data;
+        }
+
+        return $this;
+    }
+
     /**
      * Push one or more items onto the end of the collection.
      *
@@ -99,6 +112,24 @@ class GlobalsCollection
         }
 
         return $this;
+    }
+
+    /**
+     * Get item and then remove it
+     *
+     * @param  string|int  $key
+     * @param  mixed  $default  if item were not found
+     * @return mixed
+     */
+    public function pull(string|int $key, $default = null)
+    {
+        $value = $this->get($key, $default);
+        if ($this->has($key)) {
+            $this->forget($key);
+        }
+
+
+        return $value;
     }
 
     /**
@@ -256,6 +287,12 @@ class GlobalsCollection
         }
 
         return $this->get($cid);
+    }
+
+
+    public function count(): int
+    {
+        return count($this->data);
     }
 
     /**
