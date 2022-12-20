@@ -14,18 +14,26 @@ class Closure
         return static function (...$params) use ($types, $callback) {
             $keys = array_keys($params);
             $params = array_map(static function ($value, $key) use ($types) {
-                /** @var \ReflectionNamedType $type */
                 $type = $types[$key] ?? null;
 
-                if (
-                    is_null($type)
-                    || $type->isBuiltin()
-                    || ($type->allowsNull() && is_null($value))
-                ) {
+                if (is_null($type)) {
+                    return $value;
+                }
+                if ($type instanceof \ReflectionNamedType) {
+                    if ($type->isBuiltin() || ($type->allowsNull() && is_null($value))) {
+                        return $value;
+                    }
+                    $type = $type->getName();
+                }
+                else {
+                    $type = (string)$type;
+                }
+
+                if ($value instanceof $type) {
                     return $value;
                 }
 
-                return new ($type->getName())($value);
+                return new $type($value);
             }, $params, $keys);
 
             return $callback(...$params);
