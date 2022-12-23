@@ -25,8 +25,8 @@ class Path
 
     /**
      * Join path parts together into a canonical path.
+     * Also removes double // and empty parts
      *
-     * @author https://github.com/symfony/symfony/blob/6.0/src/Symfony/Component/Filesystem/Path.php
      * @param  string  ...$paths
      * @return string
      */
@@ -34,21 +34,25 @@ class Path
     {
         $finalPath = null;
         $wasScheme = false;
-
         foreach ($paths as $path) {
-            if ('' === $path) {
+            $path = trim($path);
+            if ($path === '') {
                 continue;
             }
 
             if (null === $finalPath) {
-                // For first part we keep slashes, like '/top', 'C:\' or 'phar://'
+                // For first part we keep slashes, like '/top', 'C:\' or 'phar://' ,'http://', 'https://', 'file://' etc
                 $finalPath = $path;
                 $wasScheme = (str_contains($path, '://'));
                 continue;
             }
 
-            // Only add slash if previous part didn't end with '/' or '\'
-            if (!in_array(mb_substr($finalPath, -1), ['/', '\\'])) {
+            //remove any empty path separators and double //
+            if (str_contains($path, '/')) {
+                $path = self::join(...explode('/', $path));
+            }
+
+            if (!str_ends_with($finalPath, '/') && !str_ends_with($finalPath, '\\') && !str_starts_with($path, '/')) {
                 $finalPath .= '/';
             }
 
