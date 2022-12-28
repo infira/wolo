@@ -2,6 +2,8 @@
 
 namespace Wolo\File;
 
+use Wolo\Str;
+
 class Path
 {
     /**
@@ -21,6 +23,13 @@ class Path
         }
 
         return $path;
+    }
+
+    public static function relative(string $path, string $root): string
+    {
+        $root = self::slash($root);
+
+        return Str::afterLast($path, $root);
     }
 
     /**

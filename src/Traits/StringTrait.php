@@ -255,6 +255,27 @@ trait StringTrait
     }
 
     /**
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     * @author \Illuminate\Support\Str
+     */
+    public static function afterLast(string $subject, string $search): string
+    {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strrpos($subject, $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
+    }
+
+    /**
      * @example Flu::wrap('value','{','}') // "{value}"
      * @example Flu::wrap('value',['{','}']) //"{value}"
      * @example Flu::wrap('value',['{','['],['}',']']) // "[{value}]"

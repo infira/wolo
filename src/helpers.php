@@ -32,6 +32,47 @@ if (!function_exists('debugClean')) {
         debug(...$var);
     }
 }
+if (!function_exists('debugFunctionArgs')) {
+    function debugFunctionArgs(): void
+    {
+        $trace = debug_backtrace()[1];
+        if (isset($trace['class'])) {
+            $ref = new \ReflectionMethod($trace['class'], $trace['function']);
+        }
+        else {
+            $ref = new \ReflectionFunction($trace['function']);
+        }
+        $values = $trace['args'];
+        $countValues = count($values);
+        $names = array_map(function (\ReflectionParameter $param) {
+            return $param->getName();
+        }, $ref->getParameters());
+        $countNames = count($names);;
+        if ($countNames === $countValues) {
+            debug(array_combine($names, $values));
+
+            return;
+        }
+        if ($countNames > $countValues) {
+            debug(
+                array_merge(
+                    array_combine(array_slice($names, 0, $countValues), $values),
+                    ['un_matched_parameters' => array_slice($names, $countValues)]
+                )
+            );
+
+            return;
+        }
+        debug(
+            array_merge(
+                array_combine($names, array_slice($values, 0, $countNames)),
+                ['un_matched_values' => array_slice($values, $countNames)]
+            )
+        );
+
+        return;
+    }
+}
 
 if (!function_exists('setGetTraceItemHandler')) {
     function setGetTraceItemHandler(callable $callback): void
