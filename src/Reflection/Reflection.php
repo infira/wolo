@@ -2,6 +2,13 @@
 
 namespace Wolo\Reflection;
 
+use ReflectionClass;
+use ReflectionException;
+use ReflectionFunction;
+use ReflectionFunctionAbstract;
+use ReflectionMethod;
+use ReflectionParameter;
+
 class Reflection
 {
     /**
@@ -10,10 +17,11 @@ class Reflection
      * @param  string|object  $objectOrClass
      * @param  int  $depth  - check also parents traits, 0 all teh way to to last parent
      * @return array
+     * @throws ReflectionException
      */
     public static function getClassTraits(string|object $objectOrClass, int $depth = 0): array
     {
-        $class = new \ReflectionClass($objectOrClass);
+        $class = new ReflectionClass($objectOrClass);
         $traits = $class->getTraits();
         if ($depth !== null) {
             $currentDepth = 0;
@@ -35,6 +43,7 @@ class Reflection
      * @param  string|object  $findObjectOrClass
      * @param  bool  $checkParents
      * @return bool
+     * @throws ReflectionException
      */
     public static function classHasTrait(string|object $objectOrClass, string|object $findObjectOrClass, bool $checkParents = true): bool
     {
@@ -47,5 +56,21 @@ class Reflection
         }
 
         return false;
+    }
+
+    /**
+     * @return ReflectionParameter[]
+     * @throws ReflectionException
+     */
+    public static function getParameters(callable|ReflectionFunctionAbstract $callable): array
+    {
+        if ($callable instanceof ReflectionFunctionAbstract) {
+            return $callable->getParameters();
+        }
+        if (is_array($callable)) {
+            return (new ReflectionMethod(...$callable))->getParameters();
+        }
+
+        return (new ReflectionFunction($callable))->getParameters();
     }
 }
