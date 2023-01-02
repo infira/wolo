@@ -73,4 +73,39 @@ class Reflection
 
         return (new ReflectionFunction($callable))->getParameters();
     }
+
+    /**
+     * @throws ReflectionException
+     */
+    public static function getParameterNamesAndTypes(callable|ReflectionFunctionAbstract $callable): array
+    {
+        $params = self::getParameters($callable);
+
+        return array_combine(
+            array_map(
+                static fn(ReflectionParameter $p) => $p->getName(),
+                $params
+            ),
+            array_map(
+                static fn(ReflectionParameter $p) => $p->getType()?->getName(),
+                $params
+            )
+        );
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public static function getFirstParam(callable|ReflectionFunctionAbstract $callable): ?ReflectionParameter
+    {
+        return self::getParamAt(0, $callable);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public static function getParamAt(int $index, callable|ReflectionFunctionAbstract $callable): ?ReflectionParameter
+    {
+        return self::getParameters($callable)[$index] ?? null;
+    }
 }

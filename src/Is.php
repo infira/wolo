@@ -2,8 +2,6 @@
 
 namespace Wolo;
 
-use Stringable;
-
 class Is
 {
     /**
