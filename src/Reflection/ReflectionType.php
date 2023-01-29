@@ -8,8 +8,11 @@ use Wolo\TypeJuggling;
 
 class ReflectionType
 {
-    public static function valueMatches(mixed $value, \ReflectionType $type): bool
+    public static function valueMatches(mixed $value, ?\ReflectionType $type, bool $allowClassString = false): bool
     {
+        if (!$type) {
+            return false;
+        }
         if (is_null($value) && $type->allowsNull()) {
             return true;
         }
@@ -20,7 +23,7 @@ class ReflectionType
                 return true;
             }
 
-            return TypeJuggling::valueMatches($value, $type->getName());
+            return TypeJuggling::valueMatches($value, $type->getName(), $allowClassString);
         }
 
 

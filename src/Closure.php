@@ -6,6 +6,7 @@ use ReflectionException;
 use ReflectionParameter;
 use Wolo\Callables\CallableInterceptor;
 use Wolo\Reflection\Reflection;
+use Wolo\Reflection\ReflectionType;
 
 class Closure
 {
@@ -64,5 +65,18 @@ class Closure
     public static function getParameters(\Closure $closure): array
     {
         return Reflection::getParameters($closure);
+    }
+
+    /**
+     * Does closure param matches to type
+     */
+    public static function paramMatchesType(int $paramIndex, \Closure $closure, string|\ReflectionNamedType $type): bool
+    {
+        $param = self::getParamAt($paramIndex, $closure);
+        if (!$param) {
+            return false;
+        }
+
+        return ReflectionType::valueMatches($type, $param->getType(), true);
     }
 }

@@ -6,10 +6,10 @@ use Wolo\Reflection\ReflectionType;
 
 class TypeJuggling
 {
-    public static function valueMatches(mixed $value, \ReflectionType|string $type): bool
+    public static function valueMatches(mixed $value, \ReflectionType|string $type, bool $allowClassString = false): bool
     {
         if ($type instanceof \ReflectionType) {
-            return ReflectionType::valueMatches($value, $type);
+            return ReflectionType::valueMatches($value, $type, $allowClassString);
         }
 
         if ($type === 'mixed') {
@@ -24,7 +24,9 @@ class TypeJuggling
             'iterable' => is_iterable($value),
             'array' => is_array($value),
             'object' => is_object($value),
-            default => $value instanceof $type
+            default => ($allowClassString && is_string($value))
+                ? is_a($value, $type, true)
+                : $value instanceof $type
         };
     }
 
