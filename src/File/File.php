@@ -256,7 +256,7 @@ class File
             $target = self::path($file);
         }
 
-        if (!is_file($target) && !is_dir($target)) {
+        if (!is_file($target) && !is_dir(dirname($target))) {
             throw new IOException("target('$target') is either file nor directory");
         }
 
