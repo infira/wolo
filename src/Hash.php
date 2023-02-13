@@ -78,7 +78,7 @@ class Hash
      */
     public static function sha1(...$data): string
     {
-        return static::make('md5', ...$data);
+        return static::make('sha1', ...$data);
     }
 
     /**
@@ -89,7 +89,7 @@ class Hash
      */
     public static function crc32b(...$data): string
     {
-        return static::make('md5', ...$data);
+        return static::make('crc32b', ...$data);
     }
 
     /**
@@ -100,6 +100,6 @@ class Hash
      */
     public static function sha512(...$data): string
     {
-        return static::make('md5', ...$data);
+        return static::make('sha512', ...$data);
     }
 }
