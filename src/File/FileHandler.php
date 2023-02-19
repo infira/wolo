@@ -85,7 +85,7 @@ class FileHandler
      */
     public function path(): string
     {
-        return File::path($this->file);
+        return $this->file;
     }
 
     /**
