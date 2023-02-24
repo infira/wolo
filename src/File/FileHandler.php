@@ -3,11 +3,12 @@
 namespace Wolo\File;
 
 use SplFileInfo;
+use Stringable;
 
 /**
  * @property-read SplFileInfo $info;
  */
-class FileHandler
+class FileHandler implements Stringable
 {
     private string $file;
 
@@ -32,6 +33,11 @@ class FileHandler
     }
 
     public function __toString(): string
+    {
+        return $this->toString();
+    }
+
+    public function toString(): string
     {
         return $this->file;
     }
