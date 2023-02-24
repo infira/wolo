@@ -31,6 +31,11 @@ class FileHandler
         return pathinfo($this->file);
     }
 
+    public function __toString(): string
+    {
+        return $this->file;
+    }
+
     public function info(): SplFileInfo
     {
         return File::info($this->file);
@@ -38,6 +43,7 @@ class FileHandler
 
     /**
      * get file extension
+     *
      * @param  bool  $lowercase  = true, convert extension to lowercase
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getextension.php
@@ -59,6 +65,7 @@ class FileHandler
 
     /**
      * file name without path info (with extension)
+     *
      * @param  string  $suffix  - Optional suffix to omit from the base name returned.
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getbasename.php
@@ -70,6 +77,7 @@ class FileHandler
 
     /**
      * detect file content mime type
+     *
      * @return string
      * @link https://www.php.net/manual/en/function.mime-content-type.php
      */
@@ -80,6 +88,7 @@ class FileHandler
 
     /**
      * Gets the path without filename
+     *
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getpath.php
      */
@@ -90,6 +99,7 @@ class FileHandler
 
     /**
      * get file lines
+     *
      * @link https://php.net/manual/en/function.file.php
      */
     public function lines(): array
@@ -99,6 +109,7 @@ class FileHandler
 
     /**
      * get file content
+     *
      * @return string|null - if file does not exists returns null
      * @link https://www.php.net/manual/en/function.file-get-contents.php
      */
@@ -109,6 +120,7 @@ class FileHandler
 
     /**
      * put file content, returns number of bytes written
+     *
      * @param  mixed  $content
      * @return int
      * @link https://www.php.net/manual/en/function.file-put-contents.php
@@ -136,6 +148,7 @@ class FileHandler
 
     /**
      * Change file name, extension will remain the same
+     *
      * @param  string  $name
      * @return bool
      */
@@ -146,8 +159,9 @@ class FileHandler
 
     /**
      * Change file extension
+     *
      * @param  string  $extension
-     * @return void
+     * @return bool
      */
     public function changeExtension(string $extension): bool
     {
@@ -156,6 +170,7 @@ class FileHandler
 
     /**
      * Rename/move file into new location
+     *
      * @param  string  $target  - when is directory then renames file into that directory without changing the name
      * @param  bool  $overwrite
      * @return bool
@@ -167,6 +182,7 @@ class FileHandler
 
     /**
      * Rename/move  file into new location only if exists
+     *
      * @param  string  $target  - when is directory then renames file into that directory without changing the name
      * @param  bool  $overwrite
      * @return bool
@@ -178,6 +194,7 @@ class FileHandler
 
     /**
      * Copy file into no location
+     *
      * @param  string  $target  - when is directory then copies file into that directory without changing the name
      * @param  bool  $overwrite
      * @return bool
@@ -189,6 +206,7 @@ class FileHandler
 
     /**
      * Copy file into no location only if exists
+     *
      * @param  string  $target  - when is directory then copies file into that directory without changing the name
      * @param  bool  $overwrite
      * @return bool
@@ -200,15 +218,26 @@ class FileHandler
 
     /**
      * Remove file (directory will not be removed)
+     *
+     * @return $this
      */
-    public function remove(): void
+    public function remove(): static
     {
         File::remove($this->file);
+
+        return $this;
     }
 
-    public function removeIfExists(): void
+    /**
+     * Remofe file only when it exists
+     *
+     * @return $this
+     */
+    public function removeIfExists(): static
     {
         File::removeIfExists($this->file);
+
+        return $this;
     }
 
     //region helpers
@@ -243,7 +272,7 @@ class FileHandler
      */
     public function basenameWithoutExtension(): string
     {
-        return $this->fileNameWithoutExtension($this->file);
+        return $this->fileNameWithoutExtension();
     }
     //endregion
 }
