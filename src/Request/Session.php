@@ -7,25 +7,32 @@ use Wolo\Request\Support\RequestVariableCollection;
 
 class Session extends InstanceShortcuts
 {
-    protected static string|null $SID = null;
+    private static RequestVariableCollection $_session;
+
+    protected static string|null $sessionId = null;
 
     /**
      * Is session expired
      *
      * @var boolean
      */
-    private static bool $isExpired = false;
+    protected static bool $isExpired = false;
 
     /**
      * Is php session started with session_start()
      *
      * @var bool
      */
-    public static bool $isStarted = false;
+    protected static bool $isStarted = false;
+    protected static ?int $uptime = null;
 
-    private static string|null $sessionName;
-    private static int $timeout = 86400;
-    private static RequestVariableCollection $_session;
+    /**
+     * @see https://www.php.net/manual/en/session.configuration.php
+     * @var array
+     */
+    protected static array $startOptions = [
+        'cookie_lifetime' => 0
+    ];
 
     protected static function instance(): RequestVariableCollection
     {
@@ -39,37 +46,42 @@ class Session extends InstanceShortcuts
     /**
      * Config sessions
      *
-     * @param  string  $sessionName  - name of the PHP session
-     * @param  string|null  $SID  start or restore session with own provided session ID,
+     * @param  string|null  $sessionId  string|null  $sessionId  - start session with id
+     * @param  array|null  $startOptions
+     * @see https://www.php.net/manual/en/session.configuration.php
      */
-    public static function init(string $sessionName = 'PHPSESSID', string $SID = null): void
+    public static function init(string $sessionId = null, array $startOptions = null): void
     {
-        if ($sessionName !== 'PHPSESSID') {
-            $sessionName = "PHPSESSID_$sessionName";
+        if ($startOptions !== null) {
+            self::setStartOptions($startOptions);
         }
-        static::$sessionName = $sessionName;
-        if (!static::$isStarted) {
-            static::$isStarted = true;
-            if ((int)ini_get('session.auto_start') === 0) {
-                static::start($SID);
+        if (!static::$isStarted && (int)ini_get('session.auto_start') === 0) {
+            static::start($sessionId);
+        }
+
+        if (self::$uptime !== null) {
+            $upTime = static::get('_sessionUpdateTime', time());
+            if ($upTime > 0 && (time() - $upTime) > static::$uptime) {
+                static::destroy(true);
+                static::$isExpired = true;
             }
+            else {
+                static::$isExpired = false;
+            }
+            self::updateUpTime();
         }
-        static::setSID(session_id());
+    }
 
-
-        $upTime = static::get('_sessionUpdateTime', time());
-        $between = time() - $upTime;
-        if ($between > static::$timeout && $upTime > 0) {
-            static::destroy(true);
-            static::$isExpired = true;
-        }
-        else {
-            static::$isExpired = false;
-        }
-        //debug(static::$sessionName);
-        //debug($_SESSION);
-        //debug('------------------------------------------------');
-        static::set('_sessionUpdateTime', time());
+    /**
+     * Retrieves a 32bit session id hash
+     *
+     * @return string
+     * @see self::getId()
+     * @deprecated
+     */
+    public static function getSID(): string
+    {
+        return static::$sessionId;
     }
 
     /**
@@ -77,44 +89,49 @@ class Session extends InstanceShortcuts
      *
      * @return string
      */
-    public static function getSID(): string
+    public static function getId(): string
     {
-        return static::$SID;
+        return static::$sessionId;
     }
 
     /**
      * Set a 32bit session id hash
      *
-     * @param  string  $SID
+     * @param  string  $id
      */
-    private static function setSID(string $SID): void
+    private static function setId(string $id): void
     {
-        static::$SID = $SID;
+        static::$sessionId = $id;
     }
 
     /**
      * Destroy session
      *
-     * @param  bool  $takeNewID  - take new session ID
+     * @param  bool  $startNewSession
      */
-    public static function destroy(bool $takeNewID = true): void
+    public static function destroy(bool $startNewSession = false): void
     {
-        static::flush();
-        session_unset();
         session_destroy();
-        if (static::$sessionName) {
-            setcookie(static::$sessionName, '', 1);
-            session_name(static::$sessionName);
-            session_set_cookie_params(static::$timeout);
+        static::$isStarted = false;
+        if ($startNewSession) {
+            self::start(session_create_id());
+            self::updateUpTime();
         }
-        static::start(); //start new session
-        //take new session ID
-        if ($takeNewID) {
-            session_regenerate_id(true);
-            $SID = session_id();
-            static::setSID($SID);
+    }
+
+    /**
+     * @param  string|null  $sessionId  - start session with id
+     * @return void
+     */
+    public static function start(string $sessionId = null): void
+    {
+        if ($sessionId) {
+            session_id($sessionId);
         }
-        unset($_COOKIE[session_name()]);
+        $opts = array_merge(self::$startOptions);
+        static::$isStarted = session_start($opts);
+        static::$_session = new RequestVariableCollection($_SESSION);
+        static::setId(session_id());
     }
 
     public static function close(): void
@@ -123,44 +140,7 @@ class Session extends InstanceShortcuts
     }
 
     /**
-     * @link https://stackoverflow.com/questions/3185779/the-session-id-is-too-long-or-contains-illegal-characters-valid-characters-are
-     * @return bool
-     */
-    private static function doStart(): bool
-    {
-        if (Cookie::has(static::$sessionName)) {
-            $sessid = Cookie::get(static::$sessionName);
-        }
-        else {
-            return session_start();
-        }
-
-        if (!preg_match('/^[a-zA-Z0-9,\-]{22,40}$/', $sessid)) {
-            return false;
-        }
-
-        return session_start();
-    }
-
-    private static function start(string $SID = null): void
-    {
-        if ($SID) {
-            session_id($SID);
-            Cookie::set(static::$sessionName, $SID);
-        }
-        if (static::$sessionName) {
-            session_name(static::$sessionName);
-        }
-        session_set_cookie_params(static::$timeout);
-        if (!static::doStart()) {
-            session_id(uniqid('', true));
-            session_start();
-            session_regenerate_id();
-        }
-    }
-
-    /**
-     * Checks is session expired
+     * Checks is session uptime exceeded
      *
      * @return bool
      */
@@ -170,10 +150,28 @@ class Session extends InstanceShortcuts
     }
 
     /**
-     * @param  int  $timeout
+     * Used in init to manualy handle session uptime, when uptime is exceeded session will be destroyd and new one started
+     *
+     * @param  int  $seconds
      */
-    public static function setTimeout(int $timeout): void
+    public static function setUptime(int $seconds): void
     {
-        static::$timeout = $timeout;
+        static::$uptime = $seconds;
+    }
+
+    /**
+     * @param  array  $options
+     * @see https://www.php.net/manual/en/session.configuration.php
+     */
+    public static function setStartOptions(array $options): void
+    {
+        static::$startOptions = $options;
+    }
+
+    private static function updateUpTime(): void
+    {
+        if (self::$uptime !== null) {
+            static::set('_sessionUpdateTime', time());
+        }
     }
 }

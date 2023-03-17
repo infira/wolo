@@ -4,12 +4,7 @@ namespace Wolo\Request\Support;
 
 abstract class InstanceShortcuts
 {
-    protected static function instance(): RequestVariableCollection
-    {
-        $data = [];
-
-        return new RequestVariableCollection($data);
-    }
+    abstract protected static function instance(): RequestVariableCollection;
 
     public static function all(): array
     {

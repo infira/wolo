@@ -27,13 +27,10 @@ class Cookie extends InstanceShortcuts
      * @param  bool  $secure  Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client. When set to TRUE, the cookie will only be set if a secure connection exists. On the server-side, it's on the programmer to send this kind of cookie only on secure connection (e.g. with respect to $_SERVER["HTTPS"]).
      * @link https://www.php.net/manual/en/function.setcookie.php
      */
-    public static function set(string $key, mixed $value, int|string $expires = 0, bool $secure = true): void
+    public static function set(string $key, mixed $value, int|string $expires = 0, bool $secure = null): void
     {
         $cookie_host = preg_replace('|^www\.(.*)$|', '.\\1', $_SERVER['HTTP_HOST']);
         if (is_string($expires)) {
-            if ($expires[0] !== "+") {
-                $expires = "+$expires";
-            }
             $expiresInTime = strtotime($expires);
         }
         elseif (is_numeric($expires)) {
@@ -46,8 +43,9 @@ class Cookie extends InstanceShortcuts
         if ($expiresInTime === 0) {
             $expires = 2147483640;
         }
-        $_COOKIE[$key] = $value;
+        $secure = $secure ?? isset($_SERVER['HTTPS']);
         setcookie($key, $value, $expires, "/", $cookie_host, $secure);
+        self::instance()->set($key, $value);
     }
 
     public static function delete(string|int|array $keys): void
