@@ -25,6 +25,10 @@ class Is
      */
     public static function between(float|int|string $nr, float|int|string $from, float|int|string $to): bool
     {
+        $nr = Str::numeric($nr);
+        $from = Str::numeric($from);
+        $to = Str::numeric($to);
+
         return ($nr >= $from and $nr <= $to);
     }
 
