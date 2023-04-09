@@ -3,7 +3,6 @@
 namespace Wolo\ClassFarm;
 
 use RuntimeException;
-use Wolo\Hash;
 
 /**
  * Create and use classes globally
@@ -21,12 +20,11 @@ class ClassFarm
      */
     public static function barn(string $name, callable|string $constructor, ...$arguments): mixed
     {
-        $hash = Hash::crc32b($name, $constructor, $arguments);
-        if (!static::has($hash)) {
-            static::put($hash, $constructor, $arguments);
+        if (!static::has($name)) {
+            static::put($name, $constructor, $arguments);
         }
 
-        return static::get($hash);
+        return static::get($name);
     }
 
     /**
