@@ -23,6 +23,11 @@ class Http extends InstanceShortcuts
     use ServerShortcuts;
     use FileShortcuts;
 
+    protected static function instance(): RequestVariableCollection
+    {
+        return static::request();
+    }
+
 
     /**
      * $_SERVER values
@@ -46,7 +51,7 @@ class Http extends InstanceShortcuts
     public static function request(): RequestVariableCollection
     {
         if (!isset(static::$request)) {
-            static::$request = new RequestVariableCollection($_GET);
+            static::$request = new RequestVariableCollection($_REQUEST);
         }
 
         return static::$request;
@@ -64,11 +69,6 @@ class Http extends InstanceShortcuts
         }
 
         return static::$get;
-    }
-
-    protected static function instance(): RequestVariableCollection
-    {
-        return static::url();
     }
 
     /**
@@ -134,7 +134,7 @@ class Http extends InstanceShortcuts
     /**
      * Get request method $_SERVER["REQUEST_METHOD"]
      *
-     * @param  bool  $inLowercase
+     * @param bool $inLowercase
      * @return string|null
      */
     public static function requestMethod(bool $inLowercase = true): ?string
@@ -146,6 +146,7 @@ class Http extends InstanceShortcuts
 
         return $rm;
     }
+
 
     /**
      * is current request ajax type
@@ -177,7 +178,7 @@ class Http extends InstanceShortcuts
     /**
      * Got to link
      *
-     * @param  string  $link  - where to go
+     * @param string $link - where to go
      */
     #[NoReturn] public static function go(string $link): void
     {
@@ -188,7 +189,7 @@ class Http extends InstanceShortcuts
     /**
      * Redirect page using 301 header
      *
-     * @param  string  $link  - where to go
+     * @param string $link - where to go
      */
     #[NoReturn] public static function go301(string $link): void
     {
@@ -199,7 +200,7 @@ class Http extends InstanceShortcuts
     /**
      * Redirect to referer url
      *
-     * @param  string  $addExtraToRefLink  - add extra params to link
+     * @param string $addExtraToRefLink - add extra params to link
      */
     #[NoReturn] public static function goToReferer(string $addExtraToRefLink = ''): void
     {
@@ -279,5 +280,31 @@ class Http extends InstanceShortcuts
         }
 
         return $ipaddress;
+    }
+
+    public static function getHeaders(bool $lowerKeys = false): array
+    {
+        $headers = apache_request_headers();
+        if (!$headers) {
+            return [];
+        }
+        if (!$lowerKeys) {
+            return $headers;
+        }
+        $output = [];
+        foreach ($headers as $headerKey => $value) {
+            $output[strtolower($headerKey)] = $value;
+        }
+        return $output;
+    }
+
+    public static function hasHeader(string $key): bool
+    {
+        return array_key_exists($key, self::getHeaders(true));
+    }
+
+    public static function getHeader(string $key, mixed $default = null): mixed
+    {
+        return self::getHeaders(true)[strtolower($key)] ?? $default;
     }
 }
