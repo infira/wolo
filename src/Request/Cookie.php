@@ -21,30 +21,52 @@ class Cookie extends InstanceShortcuts
     /**
      * Set item to $_COOKIE
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  int|string  $expires  - when expires. (int)0 - forever,(string)"10 hours" -  will be converted to time using strtotime(), (int)1596885301 - timestamp. If $expires is in the past, it will be converted as forever.
-     * @param  bool  $secure  Indicates that the cookie should only be transmitted over a secure HTTPS connection from the client. When set to TRUE, the cookie will only be set if a secure connection exists. On the server-side, it's on the programmer to send this kind of cookie only on secure connection (e.g. with respect to $_SERVER["HTTPS"]).
+     * @param string $key
+     * @param mixed $value
+     * @param int|string|array $expires_or_options - when expires. (int)0 - forever,(string)"10 hours" -  will be converted to time using strtotime(), (int)1596885301 - timestamp. If $expires is in the past, it will be converted as forever.
      * @link https://www.php.net/manual/en/function.setcookie.php
+     * @example
+     * $options = [
+     *  'expires' => 0,
+     *  'path' => '/',
+     *  'domain' => $cookie_host, // leading dot for compatibility or use subdomain, defaults to .$_SERVER['HTTP_HOST']
+     *  'secure' =>  isset($_SERVER['HTTPS'])
+     *  'httponly' => false,    // or false
+     *  'samesite' => 'none' // None || Lax  || Strict
+     * ];
      */
-    public static function set(string $key, mixed $value, int|string $expires = 0, bool $secure = null): void
+    public static function set(string $key, mixed $value, int|string|array $expires_or_options = 0): void
     {
-        $cookie_host = preg_replace('|^www\.(.*)$|', '.\\1', $_SERVER['HTTP_HOST']);
-        if (is_string($expires)) {
-            $expiresInTime = strtotime($expires);
-        }
-        elseif (is_numeric($expires)) {
-            $expiresInTime = (int)$expires;
+        $options = [
+            'expires' => 0,
+            'path' => '/',
+            'domain' => preg_replace('|^www\.(.*)$|', '.\\1', $_SERVER['HTTP_HOST']),
+            'secure' => isset($_SERVER['HTTPS']),     // or false
+            'httponly' => false,    // or false
+            'samesite' => 'none' // None || Lax  || Strict
+        ];
+        if (is_array($expires_or_options)) {
+            $options = array_merge($options, $expires_or_options);
         }
         else {
-            $expiresInTime = 0;
+            $options['expires'] = $expires_or_options;
+            $options['secure'] = isset($_SERVER['HTTPS']);
         }
 
-        if ($expiresInTime === 0) {
-            $expires = 2147483640;
+        if (is_string($options['expires'])) {
+            $options['expires'] = strtotime($options['expires']);
         }
-        $secure = $secure ?? isset($_SERVER['HTTPS']);
-        setcookie($key, $value, $expires, "/", $cookie_host, $secure);
+        else if (is_numeric($options['expires'])) {
+            $options['expires'] = (int)$options['expires'];
+        }
+        else {
+            $options['expires'] = 0;
+        }
+        if ($options['expires'] === 0) {
+            $options['expires'] = 2147483640;;
+        }
+
+        setcookie($key, $value, $options);
         self::instance()->set($key, $value);
     }
 
@@ -52,10 +74,10 @@ class Cookie extends InstanceShortcuts
     {
         foreach ((array)$keys as $key) {
             if (static::has($key)) {
+                // empty value and expiration one hour before
+                self::set($key, '', ['expires' => time() - 3600]);
                 //Actually, there is not a way to directly delete a cookie. Just use setcookie with expiration date in the past, to trigger the removal mechanism in your browser. https://www.pontikis.net/blog/create-cookies-php-javascript
                 static::instance()->delete($key);
-                // empty value and expiration one hour before
-                setcookie($key, '', time() - 3600);
             }
         }
     }
