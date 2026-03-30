@@ -11,7 +11,7 @@ abstract class InstanceShortcuts
         return static::instance()->all();
     }
 
-    public static function get(string $key = null, mixed $default = null): mixed
+    public static function get(?string $key = null, mixed $default = null): mixed
     {
         return static::instance()->get($key, $default);
     }

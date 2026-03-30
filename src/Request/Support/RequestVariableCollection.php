@@ -17,7 +17,7 @@ class RequestVariableCollection
         return $this->data;
     }
 
-    public function get(string $key = null, mixed $default = null): mixed
+    public function get(?string $key = null, mixed $default = null): mixed
     {
         if ($key === null) {
             return $this->data;

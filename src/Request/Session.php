@@ -12,7 +12,7 @@ class Session extends InstanceShortcuts
     protected static string|null $sessionId = null;
 
     /**
-     * Is session expired
+     * Is session expired?
      *
      * @var boolean
      */
@@ -46,11 +46,11 @@ class Session extends InstanceShortcuts
     /**
      * Config sessions
      *
-     * @param  string|null  $sessionId  string|null  $sessionId  - start session with id
-     * @param  array|null  $startOptions
+     * @param string|null $sessionId  string|null  $sessionId  - start session with id
+     * @param array|null $startOptions
      * @see https://www.php.net/manual/en/session.configuration.php
      */
-    public static function init(string $sessionId = null, array $startOptions = null): void
+    public static function init(?string $sessionId = null, ?array $startOptions = null): void
     {
         if ($startOptions !== null) {
             self::setStartOptions($startOptions);
@@ -120,10 +120,10 @@ class Session extends InstanceShortcuts
     }
 
     /**
-     * @param  string|null  $sessionId  - start session with id
+     * @param string|null $sessionId  - start session with id
      * @return void
      */
-    public static function start(string $sessionId = null): void
+    public static function start(?string $sessionId = null): void
     {
         if ($sessionId) {
             session_id($sessionId);

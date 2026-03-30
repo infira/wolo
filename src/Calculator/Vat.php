@@ -13,10 +13,10 @@ class Vat
 
     /**
      * Get vat percent calculation nr
-     * @param  float|int|null  $vatPercent
+     * @param float|int|null $vatPercent
      * @return float|int
      */
-    private static function getCalcPercent(float|int $vatPercent = null): float|int
+    private static function getCalcPercent(float|int|null $vatPercent = null): float|int
     {
         $vatP = $vatPercent ?: self::$percent;
 
@@ -44,7 +44,7 @@ class Vat
     }
 
     /**
-     * Add vat to amount
+     * Add vat to the amount
      * @param  float|int  $net  - amount without vat
      * @param  float|int|null  $vatPercent  - percent of vat, if null then default is used
      * @return float|int
@@ -55,7 +55,7 @@ class Vat
     }
 
     /**
-     * Remove vat from amount
+     * Remove vat from the amount
      * @param  float|int  $gross  - amount with vat
      * @param  float|int|null  $vatPercent  - percent of vat, if null then default is used
      * @return float|int

@@ -2,7 +2,6 @@
 
 namespace Wolo\Globals;
 
-
 use JetBrains\PhpStorm\ArrayShape;
 use Wolo\Hash;
 
@@ -19,7 +18,7 @@ class GlobalsCollection
     /**
      * Generates new collection
      *
-     * @param  string  $name  - collection name
+     * @param string $name - collection name
      * @return GlobalsCollection
      */
     public function of(string $name): GlobalsCollection
@@ -44,7 +43,7 @@ class GlobalsCollection
     /**
      * Checks if the item exists by key
      *
-     * @param  string|int  $key
+     * @param string|int $key
      * @return bool
      */
     public function has(string|int $key): bool
@@ -55,8 +54,8 @@ class GlobalsCollection
     /**
      * Set new item
      *
-     * @param  string|int  $key
-     * @param  mixed  $value
+     * @param string|int $key
+     * @param mixed $value
      * @return $this
      */
     public function put(string|int $key, mixed $value): static
@@ -69,7 +68,7 @@ class GlobalsCollection
     /**
      * Add new item
      *
-     * @param  mixed  $value
+     * @param mixed $value
      * @return $this
      */
     public function add(mixed $value): static
@@ -87,7 +86,7 @@ class GlobalsCollection
         return $this->add($value);
     }
 
-    public function prepend(mixed $value, string|int $key = null): static
+    public function prepend(mixed $value, string|int|null $key = null): static
     {
         if (func_num_args() == 1) {
             array_unshift($this->data, $value);
@@ -102,7 +101,7 @@ class GlobalsCollection
     /**
      * Push one or more items onto the end of the collection.
      *
-     * @param  mixed  ...$values
+     * @param mixed ...$values
      * @return $this
      */
     public function push(mixed...$values): static
@@ -115,28 +114,27 @@ class GlobalsCollection
     }
 
     /**
-     * Get item and then remove it
+     * Get an item and then remove it
      *
-     * @param  string|int  $key
-     * @param  mixed  $default  if item were not found
+     * @param string|int $key
+     * @param mixed $default if item were not found
      * @return mixed
      */
-    public function pull(string|int $key, $default = null)
+    public function pull(string|int $key, mixed $default = null)
     {
         $value = $this->get($key, $default);
         if ($this->has($key)) {
             $this->forget($key);
         }
 
-
         return $value;
     }
 
     /**
-     * Get item, if not found $returnOnNotFound will be returned
+     * Get an item, if not found $returnOnNotFound will be returned
      *
-     * @param  string|int  $key
-     * @param  mixed  $default  - if not found then that is returned
+     * @param string|int $key
+     * @param mixed $default - if not found then that is returned
      * @return mixed/bool
      */
     public function get(string|int $key, mixed $default = null): mixed
@@ -151,7 +149,7 @@ class GlobalsCollection
     /**
      * Remove an item from the collection by key.
      *
-     * @param  string|int|string[]|int[]  $keys
+     * @param string|int|string[]|int[] $keys
      * @return $this
      */
     public function forget(string|int|array $keys): static
@@ -208,7 +206,7 @@ class GlobalsCollection
     /**
      * Call $callback for every item in current collection<br />$callback($itemValue,$itemName)
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return void
      */
     public function each(callable $callback): void
@@ -221,7 +219,7 @@ class GlobalsCollection
     /**
      * Call $callback for every collection, sub collection and every item<br />$callback($itemValue,$itemName,$collectionName)
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return void
      */
     public function eachTree(callable $callback): void
@@ -237,7 +235,7 @@ class GlobalsCollection
     /**
      * Call $callback for every collection<br />$callback($Collection,$collectionName)
      *
-     * @param  callable  $callback
+     * @param callable $callback
      * @return void
      */
     public function eachCollection(callable $callback): void
@@ -260,12 +258,12 @@ class GlobalsCollection
     /**
      * Execute $callback once by hash-sum of $parameters
      *
-     * @param  mixed  ...$keys  - will be used to generate hash sum ID for storing $callback result <br>
+     * @param mixed ...$keys - will be used to generate hash sum ID for storing $callback result <br>
      * If $keys contains only callback then hash sum will be generated Closure signature
-     * @param  callable  $callback  method result will be set to memory for later use
+     * @param callable $callback method result will be set to memory for later use
      * @return mixed - $callback result
      * @noinspection PhpDocSignatureInspection
-     * @see Hash::hashable()
+     * @see          Hash::hashable()
      */
     public function once(...$keys): mixed
     {
@@ -288,7 +286,6 @@ class GlobalsCollection
 
         return $this->get($cid);
     }
-
 
     public function count(): int
     {

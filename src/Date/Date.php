@@ -61,10 +61,10 @@ class Date
      * convert to timestamp
      *
      * @param  string|int  $time
-     * @param  string|int|null  $now  - use base time or string, defaults to now ($now is converted to time)
+     * @param string|int|null $now  - use base time or string, defaults to now ($now is converted to time)
      * @return int - converted timestamp
      */
-    public static function time(string|int $time, string|int $now = null): int
+    public static function time(string|int $time, string|int|null $now = null): int
     {
         $dm = self::of($time);
         if ($now !== null) {
@@ -77,10 +77,10 @@ class Date
     /**
      * Get last of the month date
      *
-     * @param  string|null  $date  - date to time
+     * @param string|null $date  - date to time
      * @return int
      */
-    public static function lastDayOfMonth(string $date = null): int
+    public static function lastDayOfMonth(?string $date = null): int
     {
         return self::time(date("Y-m-t", self::time($date)));
     }
@@ -89,12 +89,12 @@ class Date
      * Count days between dates
      * $ignore ignore day numbers like sunday = 7
      *
-     * @param  string|null  $start  - null means now
-     * @param  string|null  $endDate  - null means now
+     * @param string|null $start  - null means now
+     * @param string|null $endDate  - null means now
      * @param  array  $ignore
      * @return int
      */
-    public static function daysBetween(string $start = null, string $endDate = null, array $ignore = []): int
+    public static function daysBetween(?string $start = null, ?string $endDate = null, array $ignore = []): int
     {
         $result = 0;
         $start = self::of($start)->sqlDate();

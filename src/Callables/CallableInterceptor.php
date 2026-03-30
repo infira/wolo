@@ -3,7 +3,6 @@
 namespace Wolo\Callables;
 
 use Closure;
-use Infira\Error\Error;
 use ReflectionException;
 use ReflectionParameter;
 use ReflectionType;
@@ -23,7 +22,6 @@ class CallableInterceptor
      * @var callable
      */
     private $callback;
-
 
     /**
      * @var ReflectionParameter[]
@@ -59,8 +57,8 @@ class CallableInterceptor
     /**
      * intercept callable argument by index
      *
-     * @param  string|int|array  $argIndex
-     * @param  callable(ReflectionParameter, TParamValue, TArguments): mixed  $converter
+     * @param string|int|array $argIndex
+     * @param callable(ReflectionParameter, TParamValue, TArguments): mixed $converter
      * @return $this
      */
     public function at(string|int|array $argIndex, callable $converter): static
@@ -71,8 +69,8 @@ class CallableInterceptor
     /**
      * intercept callable argument by index when argument type does not match
      *
-     * @param  string|int|array  $argIndex  argument position, or '*' for all arguments
-     * @param  callable(ReflectionType, TParamValue, TArguments): mixed  $converter
+     * @param string|int|array $argIndex argument position, or '*' for all arguments
+     * @param callable(ReflectionType, TParamValue, TArguments): mixed $converter
      * @return $this
      */
     public function atWhenNoTypeMatch(string|int|array $argIndex, callable $converter): static
@@ -80,9 +78,8 @@ class CallableInterceptor
         return $this->addConverter($argIndex, self::CONVERT_WHEN_TYPE_NOT_MATCH, $converter);
     }
 
-
     /**
-     * @param  bool  $auto  - when all converters are passed try automatically cast type
+     * @param bool $auto - when all converters are passed try automatically cast type
      * @return Closure
      * @throws ReflectionException
      */
@@ -105,7 +102,7 @@ class CallableInterceptor
                 if (isset($this->paramConverters[$index])) {
                     $converter = $this->paramConverters[$index];
                 }
-                elseif (isset($this->paramConverters['*'])) {
+                else if (isset($this->paramConverters['*'])) {
                     $converter = $this->paramConverters['*'];
                 }
 
@@ -126,7 +123,6 @@ class CallableInterceptor
                     continue;
                 }
 
-
                 if (TypeJuggling::valueMatches($value, $type)) {
                     continue;
                 }
@@ -145,11 +141,6 @@ class CallableInterceptor
                     $arguments[$index] = TypeJuggling::cast($value, $type);
                 }
             }
-
-//            Error::setDebug('$arguments', [
-//                '$arguments' => $arguments,
-//                '$this->>params' => Reflection::getParameterNamesAndTypes($this->callback),
-//            ]);
 
             return ($this->callback)(...$arguments);
         };

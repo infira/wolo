@@ -5,7 +5,7 @@ namespace Wolo\Globals;
 use Wolo\ClassFarm\ClassFarm;
 
 /**
- * A utility to store data in php runtimememory
+ * A utility to store data in php runtime memory
  * @method static string name()
  * @method static bool has(string|int $key)
  * @method static GlobalsCollection put(string|int $key, mixed $value)

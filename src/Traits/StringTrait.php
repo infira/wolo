@@ -281,10 +281,10 @@ trait StringTrait
      * @example Flu::wrap('value',['{','['],['}',']']) // "[{value}]"
      * @param  mixed  $value
      * @param  string|array  $before
-     * @param  string|array|null  $after
+     * @param string|array|null $after
      * @return string
      */
-    public static function wrap(mixed $value, string|array $before, string|array $after = null): string
+    public static function wrap(mixed $value, string|array $before, string|array|null $after = null): string
     {
         if (is_array($before) && $after === null) {
             [$before, $after] = $before;

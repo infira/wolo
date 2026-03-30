@@ -15,7 +15,7 @@ trait GetShortcuts
         return static::url()->all();
     }
 
-    public static function getGET(string $key = null, mixed $default = null): mixed
+    public static function getGET(?string $key = null, mixed $default = null): mixed
     {
         return static::url()->get($key, $default);
     }

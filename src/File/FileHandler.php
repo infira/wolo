@@ -20,12 +20,11 @@ class FileHandler implements Stringable
     public function __get(string $name)
     {
         if ($name === 'info') {
-            $this->info = $this->info();
-
-            return $this->info;
+            return $this->info();
         }
         throw new \RuntimeException("property('$name') does not exists");
     }
+
 
     public function __debugInfo(): ?array
     {
@@ -50,7 +49,7 @@ class FileHandler implements Stringable
     /**
      * get file extension
      *
-     * @param  bool  $lowercase  = true, convert extension to lowercase
+     * @param bool $lowercase = true, convert extension to lowercase
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getextension.php
      */
@@ -72,7 +71,7 @@ class FileHandler implements Stringable
     /**
      * file name without path info (with extension)
      *
-     * @param  string  $suffix  - Optional suffix to omit from the base name returned.
+     * @param string $suffix - Optional suffix to omit from the base name returned.
      * @return string
      * @link https://www.php.net/manual/en/splfileinfo.getbasename.php
      */
@@ -127,7 +126,7 @@ class FileHandler implements Stringable
     /**
      * put file content, returns number of bytes written
      *
-     * @param  mixed  $content
+     * @param mixed $content
      * @return int
      * @link https://www.php.net/manual/en/function.file-put-contents.php
      */
@@ -140,7 +139,6 @@ class FileHandler implements Stringable
     {
         return file_exists($this->file);
     }
-
 
     /**
      * Determine if a file or directory is missing.
@@ -155,7 +153,7 @@ class FileHandler implements Stringable
     /**
      * Change file name, extension will remain the same
      *
-     * @param  string  $name
+     * @param string $name
      * @return bool
      */
     public function changeName(string $name): bool
@@ -166,7 +164,7 @@ class FileHandler implements Stringable
     /**
      * Change file extension
      *
-     * @param  string  $extension
+     * @param string $extension
      * @return bool
      */
     public function changeExtension(string $extension): bool
@@ -177,8 +175,8 @@ class FileHandler implements Stringable
     /**
      * Rename/move file into new location
      *
-     * @param  string  $target  - when is directory then renames file into that directory without changing the name
-     * @param  bool  $overwrite
+     * @param string $target - when is directory then renames file into that directory without changing the name
+     * @param bool $overwrite
      * @return bool
      */
     public function rename(string $target, bool $overwrite = false): bool
@@ -189,8 +187,8 @@ class FileHandler implements Stringable
     /**
      * Rename/move  file into new location only if exists
      *
-     * @param  string  $target  - when is directory then renames file into that directory without changing the name
-     * @param  bool  $overwrite
+     * @param string $target - when is directory then renames file into that directory without changing the name
+     * @param bool $overwrite
      * @return bool
      */
     public function renameIfExists(string $target, bool $overwrite = false): bool
@@ -201,8 +199,8 @@ class FileHandler implements Stringable
     /**
      * Copy file into no location
      *
-     * @param  string  $target  - when is directory then copies file into that directory without changing the name
-     * @param  bool  $overwrite
+     * @param string $target - when is directory then copies file into that directory without changing the name
+     * @param bool $overwrite
      * @return bool
      */
     public function copy(string $target, bool $overwrite = false): bool
@@ -213,8 +211,8 @@ class FileHandler implements Stringable
     /**
      * Copy file into no location only if exists
      *
-     * @param  string  $target  - when is directory then copies file into that directory without changing the name
-     * @param  bool  $overwrite
+     * @param string $target - when is directory then copies file into that directory without changing the name
+     * @param bool $overwrite
      * @return bool
      */
     public function copyIfExists(string $target, bool $overwrite = false): bool

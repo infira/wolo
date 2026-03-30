@@ -193,7 +193,7 @@ class Http extends InstanceShortcuts
      */
     #[NoReturn] public static function go301(string $link): void
     {
-        Header("HTTP/1.1 301 Moved Permanently", true, 301);
+        header("HTTP/1.1 301 Moved Permanently", true, 301);
         static::go($link);
     }
 

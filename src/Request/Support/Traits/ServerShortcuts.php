@@ -15,7 +15,7 @@ trait ServerShortcuts
         return static::server()->all();
     }
 
-    public static function getSERVER(string $key = null, mixed $default = null): mixed
+    public static function getSERVER(?string $key = null, mixed $default = null): mixed
     {
         return static::server()->get($key, $default);
     }

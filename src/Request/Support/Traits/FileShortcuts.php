@@ -15,7 +15,7 @@ trait FileShortcuts
         return static::file()->all();
     }
 
-    public static function getFILE(string $key = null, mixed $default = null): mixed
+    public static function getFILE(?string $key = null, mixed $default = null): mixed
     {
         return static::file()->get($key, $default);
     }

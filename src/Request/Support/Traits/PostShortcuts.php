@@ -15,7 +15,7 @@ trait PostShortcuts
         return static::post()->all();
     }
 
-    public static function getPOST(string $key = null, mixed $default = null): mixed
+    public static function getPOST(?string $key = null, mixed $default = null): mixed
     {
         return static::post()->get($key, $default);
     }
